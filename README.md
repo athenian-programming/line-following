@@ -52,8 +52,5 @@ $ line_follower.py --bgr "[174, 56, 5]" --display
 * [OpenCV](http://www.athenian-robotics.org/opencv/)
 * [Plot.ly](http://www.athenian-robotics.org/plotly/)
 
-
-## Setup Details
-
 Instructions on how to display Raspi OpenCV camera images on a Mac are 
 [here](http://www.athenian-robotics.org/opencv/)
