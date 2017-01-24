@@ -9,11 +9,10 @@ import traceback
 from logging import info
 from threading import Lock
 
+import camera
 import cv2
 import imutils
 import numpy as np
-
-import camera
 import opencv_defaults as defs
 import opencv_utils as utils
 from common_utils import is_raspi
@@ -22,6 +21,7 @@ from opencv_utils import BLUE
 from opencv_utils import GREEN
 from opencv_utils import RED
 from opencv_utils import YELLOW
+
 from position_server import PositionServer
 
 if is_raspi():
@@ -267,7 +267,9 @@ class LineFollower(object):
 
                     key = cv2.waitKey(30) & 0xFF
 
-                    if key == ord("w"):
+                    if key == 255:
+                        pass
+                    elif key == ord("w"):
                         self.set_width(self.__width - 10)
                     elif key == ord("W"):
                         self.set_width(self.__width + 10)
