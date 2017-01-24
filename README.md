@@ -40,3 +40,20 @@ $ line_follower.py --bgr "[174, 56, 5]" --display
 | -v, --verbose  | Include debugging info                             | false   |
 | -h, --help     | Summary of options                                 |         |
 
+## Relevant Links
+
+### Hardware
+* [Raspberry Pi Camera](https://www.adafruit.com/products/3099)
+* [Blinkt](http://www.athenian-robotics.org/blinkt/)
+
+### Software
+* [pyfirmata](http://www.athenian-robotics.org/pyfirmata/)
+* [gRPC](http://www.athenian-robotics.org/grpc/)
+* [OpenCV](http://www.athenian-robotics.org/opencv/)
+* [Plot.ly](http://www.athenian-robotics.org/plotly/)
+
+
+## Setup Details
+
+Instructions on how to display Raspi OpenCV camera images on a Mac are 
+[here](http://www.athenian-robotics.org/opencv/)
