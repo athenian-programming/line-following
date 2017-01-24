@@ -47,7 +47,6 @@ $ line_follower.py --bgr "[174, 56, 5]" --display
 * [Blinkt](http://www.athenian-robotics.org/blinkt/)
 
 ### Software
-* [pyfirmata](http://www.athenian-robotics.org/pyfirmata/)
 * [gRPC](http://www.athenian-robotics.org/grpc/)
 * [OpenCV](http://www.athenian-robotics.org/opencv/)
 * [Plot.ly](http://www.athenian-robotics.org/plotly/)
