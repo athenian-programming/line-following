@@ -2,18 +2,14 @@ import logging
 import time
 from threading import Thread
 
+from common_constants import LOGGING_ARGS
 from common_utils import sleep
 
-from common_constants import LOGGING_ARGS
 from position_server import PositionServer
 
 
 def test_position_server(port):
-    server = PositionServer(port)
-    try:
-        server.start()
-    except BaseException as e:
-        logging.error("Unable to start position server [{0}]".format(e))
+    server = PositionServer(port).start()
 
     for i in range(0, 100):
         server.write_position(in_focus=True if i % 2 == 0 else False,

@@ -4,12 +4,12 @@ from threading import Thread
 
 import grpc
 from concurrent import futures
+from grpc_support import GenericServer
 
 from gen.grpc_server_pb2 import FocusLinePosition
 from gen.grpc_server_pb2 import FocusLinePositionServerServicer
 from gen.grpc_server_pb2 import ServerInfo
 from gen.grpc_server_pb2 import add_FocusLinePositionServerServicer_to_server
-from grpc_support import GenericServer
 
 
 class PositionServer(FocusLinePositionServerServicer, GenericServer):
@@ -55,3 +55,4 @@ class PositionServer(FocusLinePositionServerServicer, GenericServer):
     def start(self):
         Thread(target=self.start_position_server).start()
         time.sleep(1)
+        return self
