@@ -5,6 +5,7 @@ import logging
 
 from common_constants import LOGGING_ARGS
 from grpc_support import TimeoutException
+
 from position_client import PositionClient
 
 if __name__ == "__main__":
@@ -14,8 +15,7 @@ if __name__ == "__main__":
 
     logging.basicConfig(**LOGGING_ARGS)
 
-    positions = PositionClient(args["grpc"])
-    positions.start()
+    positions = PositionClient(args["grpc"]).start()
 
     try:
         while True:
@@ -24,6 +24,8 @@ if __name__ == "__main__":
             except TimeoutException:
                 print("No change in value")
     except KeyboardInterrupt:
-        print("Exiting...")
+        pass
     finally:
         positions.stop()
+
+    print("Exiting...")

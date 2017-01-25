@@ -10,7 +10,6 @@ from position_server import PositionServer
 
 def test_position_server(port):
     server = PositionServer(port).start()
-
     for i in range(0, 100):
         server.write_position(in_focus=True if i % 2 == 0 else False,
                               mid_offset=i,

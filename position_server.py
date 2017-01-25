@@ -15,6 +15,7 @@ from gen.grpc_server_pb2 import add_FocusLinePositionServerServicer_to_server
 class PositionServer(FocusLinePositionServerServicer, GenericServer):
     def __init__(self, port):
         super(PositionServer, self).__init__(port)
+        self._stopped = False
         self._grpc_server = None
 
     def registerClient(self, request, context):
@@ -56,3 +57,6 @@ class PositionServer(FocusLinePositionServerServicer, GenericServer):
         Thread(target=self.start_position_server).start()
         time.sleep(1)
         return self
+
+    def stop(self):
+        self._stopped = True

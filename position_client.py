@@ -6,11 +6,11 @@ from threading import Event
 from threading import Thread
 
 import grpc
+from grpc_support import GenericClient
+from grpc_support import TimeoutException
 
 from gen.grpc_server_pb2 import ClientInfo
 from gen.grpc_server_pb2 import FocusLinePositionServerStub
-from grpc_support import GenericClient
-from grpc_support import TimeoutException
 
 
 class PositionClient(GenericClient):
@@ -73,6 +73,7 @@ class PositionClient(GenericClient):
 
     def start(self):
         Thread(target=self.read_positions).start()
+        return self
 
     def stop(self):
         if not self._stopped:

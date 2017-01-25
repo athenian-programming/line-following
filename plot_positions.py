@@ -7,9 +7,9 @@ from logging import info
 import plotly.graph_objs as go
 import plotly.plotly as py
 import plotly.tools as tls
-
 from common_constants import LOGGING_ARGS
 from grpc_support import TimeoutException
+
 from position_client import PositionClient
 
 if __name__ == "__main__":
@@ -22,8 +22,7 @@ if __name__ == "__main__":
     logging.basicConfig(**LOGGING_ARGS)
 
     # Start position client
-    positions = PositionClient(args["grpc"])
-    positions.start()
+    positions = PositionClient(args["grpc"]).start()
 
     stream_ids = tls.get_credentials_file()['stream_ids']
     stream_id = stream_ids[1]
