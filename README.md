@@ -47,8 +47,8 @@ $ line_follower.py --bgr "[174, 56, 5]" --display
 * [Blinkt](http://www.athenian-robotics.org/blinkt/)
 
 ### Software
-* [gRPC](http://www.athenian-robotics.org/grpc/)
 * [OpenCV](http://www.athenian-robotics.org/opencv/)
+* [gRPC](http://www.athenian-robotics.org/grpc/)
 * [Plot.ly](http://www.athenian-robotics.org/plotly/)
 
 Instructions on how to display Raspi OpenCV camera images on a Mac are 
