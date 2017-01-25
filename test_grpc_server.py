@@ -2,19 +2,10 @@ import logging
 import time
 from threading import Thread
 
-from location_server import LocationServer
+from common_utils import sleep
 
 from common_constants import LOGGING_ARGS
 from position_server import PositionServer
-
-
-def test_location_server(port):
-    server = LocationServer(port)
-    server.start()
-
-    for i in range(0, 100):
-        server.write_location(x=i, y=i + 1, width=i + 2, height=i + 3, middle_inc=i + 4)
-        time.sleep(1)
 
 
 def test_position_server(port):
@@ -36,8 +27,5 @@ def test_position_server(port):
 
 if __name__ == "__main__":
     logging.basicConfig(**LOGGING_ARGS)
-
-    Thread(target=test_location_server, args=(50052,)).start()
-    Thread(target=test_position_server, args=(50053,)).start()
-    while True:
-        time.sleep(60)
+    Thread(target=test_position_server, args=(50052,)).start()
+    sleep()
