@@ -24,9 +24,9 @@ from opencv_utils import YELLOW
 
 from position_server import PositionServer
 
-
-# if is_raspi():
-#    from blinkt import set_pixel, show, clear
+# I tried to include this in the constructor and make it depedent on self.__leds, but it does not work
+if is_raspi():
+    from blinkt import set_pixel, show
 
 
 class LineFollower(object):
@@ -63,9 +63,6 @@ class LineFollower(object):
         self.__contour_finder = ContourFinder(bgr_color, hsv_range)
         self.__position_server = PositionServer(grpc_port)
         self.__cam = camera.Camera(use_picamera=not usb_camera)
-
-        if self.__leds:
-            from blinkt import set_pixel, show, clear
 
     def set_focus_line_pct(self, focus_line_pct):
         if 1 <= focus_line_pct <= 99:
@@ -307,8 +304,7 @@ class LineFollower(object):
         self.__position_server.stop()
 
     def clear_leds(self):
-        if self.__leds:
-            clear()
+        self.set_leds([0, 0, 0])
 
     def set_leds(self, color):
         if self.__leds:
