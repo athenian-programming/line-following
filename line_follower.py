@@ -24,8 +24,8 @@ from opencv_utils import YELLOW
 
 from position_server import PositionServer
 
-if is_raspi():
-    from blinkt import set_pixel, show, clear
+#if is_raspi():
+#    from blinkt import set_pixel, show, clear
 
 
 class LineFollower(object):
@@ -38,7 +38,8 @@ class LineFollower(object):
                  hsv_range,
                  grpc_port,
                  report_midline,
-                 display):
+                 display,
+                 usb_camera=False):
         self.__focus_line_pct = focus_line_pct
         self.__width = width
         self.__orig_percent = percent
@@ -58,7 +59,7 @@ class LineFollower(object):
 
         self.__contour_finder = ContourFinder(bgr_color, hsv_range)
         self.__position_server = PositionServer(grpc_port)
-        self.__cam = camera.Camera()
+        self.__cam = camera.Camera(use_picamera=not usb_camera)
 
     def set_focus_line_pct(self, focus_line_pct):
         if 1 <= focus_line_pct <= 99:
@@ -313,23 +314,26 @@ def distance(point1, point2):
 
 
 def set_left_leds(color):
-    if is_raspi():
-        for i in range(0, 4):
-            set_pixel(i, color[2], color[1], color[0], brightness=0.05)
-        show()
+    #if is_raspi():
+    #    for i in range(0, 4):
+    #        set_pixel(i, color[2], color[1], color[0], brightness=0.05)
+    #    show()
+    pass
 
 
 def set_right_leds(color):
-    if is_raspi():
-        for i in range(4, 8):
-            set_pixel(i, color[2], color[1], color[0], brightness=0.05)
-        show()
+    #if is_raspi():
+    #    for i in range(4, 8):
+    #        set_pixel(i, color[2], color[1], color[0], brightness=0.05)
+    #    show()
+    pass
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-p", "--port", default=50051, type=int, help="gRPC port [50051]")
     parser.add_argument("-b", "--bgr", type=str, required=True, help="BGR target value, e.g., -b \"[174, 56, 5]\"")
+    parser.add_argument("-u", "--usb", default=False, action="store_true", help="User USB Raspi camera [false]")
     parser.add_argument("-f", "--focus", default=10, type=int, help="Focus line % from bottom [10]")
     parser.add_argument("-w", "--width", default=400, type=int, help="Image width [400]")
     parser.add_argument("-e", "--percent", default=15, type=int, help="Middle percent [15]")
@@ -347,13 +351,14 @@ if __name__ == "__main__":
 
     line_follower = LineFollower(eval(args["bgr"]),
                                  args["focus"],
-                                 int(args["width"]),
-                                 int(args["percent"]),
-                                 int(args["min"]),
-                                 int(args["range"]),
+                                 args["width"],
+                                 args["percent"],
+                                 args["min"],
+                                 args["range"],
                                  args["port"],
                                  args["midline"],
-                                 args["display"])
+                                 args["display"],
+                                 usb_camera=args["usb"])
 
     try:
         line_follower.start()
