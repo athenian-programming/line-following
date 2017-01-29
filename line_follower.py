@@ -25,7 +25,7 @@ from opencv_utils import YELLOW
 from position_server import PositionServer
 
 
-#if is_raspi():
+# if is_raspi():
 #    from blinkt import set_pixel, show, clear
 
 
@@ -37,10 +37,11 @@ class LineFollower(object):
                  percent,
                  minimum,
                  hsv_range,
-                 grpc_port,
-                 report_midline,
-                 display,
-                 usb_camera=False):
+                 grpc_port=50051,
+                 report_midline=False,
+                 display=False,
+                 usb_camera=False,
+                 leds=False):
         self.__focus_line_pct = focus_line_pct
         self.__width = width
         self.__orig_percent = percent
@@ -49,7 +50,8 @@ class LineFollower(object):
         self.__minimum = minimum
         self.__report_midline = report_midline
         self.__display = display
-        self.__closed = False
+        self.__leds = leds
+        self.__stopped = False
 
         self.__prev_focus_img_x = -1
         self.__prev_mid_line_cross = -1
@@ -61,6 +63,9 @@ class LineFollower(object):
         self.__contour_finder = ContourFinder(bgr_color, hsv_range)
         self.__position_server = PositionServer(grpc_port)
         self.__cam = camera.Camera(use_picamera=not usb_camera)
+
+        if self.__leds:
+            pass
 
     def set_focus_line_pct(self, focus_line_pct):
         if 1 <= focus_line_pct <= 99:
@@ -88,7 +93,7 @@ class LineFollower(object):
 
         self.__position_server.write_position(False, -1, -1, -1, -1, -1)
 
-        while self.__cam.is_open() and not self.__closed:
+        while self.__cam.is_open() and not self.__stopped:
             try:
                 image = self.__cam.read()
                 image = imutils.resize(image, width=self.__width)
@@ -236,12 +241,7 @@ class LineFollower(object):
                     self.__prev_focus_img_x = focus_img_x
                     self.__prev_mid_line_cross = mid_line_cross
 
-                if focus_x_missing:
-                    set_left_leds(RED)
-                    set_right_leds(RED)
-                else:
-                    set_left_leds(GREEN if focus_in_middle else BLUE)
-                    set_right_leds(GREEN if focus_in_middle else BLUE)
+                self.set_leds(RED if focus_x_missing else (GREEN if focus_in_middle else BLUE))
 
                 if self.__display:
                     # Draw focus line
@@ -299,13 +299,22 @@ class LineFollower(object):
                 traceback.print_exc()
                 logging.error("Unexpected error in main loop [{0}]".format(e))
 
-        if is_raspi():
-            clear()
+        self.clear_leds()
         self.__cam.close()
 
     def stop(self):
-        self.__closed = True
+        self.__stopped = True
         self.__position_server.stop()
+
+    def clear_leds(self):
+        if self.__leds:
+            clear()
+
+    def set_leds(self, color):
+        if self.__leds:
+            for i in range(0, 8):
+                set_pixel(i, color[2], color[1], color[0], brightness=0.05)
+            show()
 
 
 def distance(point1, point2):
@@ -314,25 +323,9 @@ def distance(point1, point2):
     return int(math.sqrt(xsqr + ysqr))
 
 
-def set_left_leds(color):
-    #if is_raspi():
-    #    for i in range(0, 4):
-    #        set_pixel(i, color[2], color[1], color[0], brightness=0.05)
-    #    show()
-    pass
-
-
-def set_right_leds(color):
-    #if is_raspi():
-    #    for i in range(4, 8):
-    #        set_pixel(i, color[2], color[1], color[0], brightness=0.05)
-    #    show()
-    pass
-
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-b", "--bgr", type=str, required=True, help="BGR target value, e.g., -b \"[174, 56, 5]\"")
+    parser.add_argument("-b", "--bgr", type=str, required=True, help="BGR target value, e.g., -b \"174, 56, 5\"")
     parser.add_argument("-u", "--usb", default=False, action="store_true", help="Use USB Raspi camera [false]")
     parser.add_argument("-f", "--focus", default=10, type=int, help="Focus line % from bottom [10]")
     parser.add_argument("-w", "--width", default=400, type=int, help="Image width [400]")
@@ -341,6 +334,7 @@ if __name__ == "__main__":
     parser.add_argument("-r", "--range", default=20, type=int, help="HSV range")
     parser.add_argument("-i", "--midline", default=False, action="store_true",
                         help="Report data when changes in midline [false]")
+    parser.add_argument("-l", "--leds", default=False, action="store_true", help="Enable Blinkt led feedback [false]")
     parser.add_argument("-d", "--display", default=False, action="store_true", help="Display image [false]")
     parser.add_argument("-p", "--port", default=50051, type=int, help="gRPC port [50051]")
     parser.add_argument("-v", "--verbose", default=logging.INFO, help="Include debugging info",
@@ -350,16 +344,17 @@ if __name__ == "__main__":
     logging.basicConfig(stream=sys.stdout, level=args["loglevel"],
                         format="%(funcName)s():%(lineno)i: %(message)s %(levelname)s")
 
-    line_follower = LineFollower(eval(args["bgr"]),
-                                 args["focus"],
-                                 args["width"],
-                                 args["percent"],
-                                 args["min"],
-                                 args["range"],
-                                 args["port"],
-                                 args["midline"],
-                                 args["display"],
-                                 usb_camera=args["usb"])
+    line_follower = LineFollower(bgr_color=eval(args["bgr"] if "[" in args["bgr"] else "[{0}]".format(args["bgr"])),
+                                 focus_line_pct=args["focus"],
+                                 width=args["width"],
+                                 percent=args["percent"],
+                                 minimum=args["min"],
+                                 hsv_range=args["range"],
+                                 grpc_port=args["port"],
+                                 report_midline=args["midline"],
+                                 display=args["display"],
+                                 usb_camera=args["usb"],
+                                 leds=args["leds"] and is_raspi())
 
     try:
         line_follower.start()
