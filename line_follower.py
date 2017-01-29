@@ -65,7 +65,7 @@ class LineFollower(object):
         self.__cam = camera.Camera(use_picamera=not usb_camera)
 
         if self.__leds:
-            pass
+            from blinkt import set_pixel, show, clear
 
     def set_focus_line_pct(self, focus_line_pct):
         if 1 <= focus_line_pct <= 99:
