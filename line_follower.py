@@ -24,6 +24,7 @@ from opencv_utils import YELLOW
 
 from position_server import PositionServer
 
+
 #if is_raspi():
 #    from blinkt import set_pixel, show, clear
 
@@ -331,9 +332,8 @@ def set_right_leds(color):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-p", "--port", default=50051, type=int, help="gRPC port [50051]")
     parser.add_argument("-b", "--bgr", type=str, required=True, help="BGR target value, e.g., -b \"[174, 56, 5]\"")
-    parser.add_argument("-u", "--usb", default=False, action="store_true", help="User USB Raspi camera [false]")
+    parser.add_argument("-u", "--usb", default=False, action="store_true", help="Use USB Raspi camera [false]")
     parser.add_argument("-f", "--focus", default=10, type=int, help="Focus line % from bottom [10]")
     parser.add_argument("-w", "--width", default=400, type=int, help="Image width [400]")
     parser.add_argument("-e", "--percent", default=15, type=int, help="Middle percent [15]")
@@ -342,6 +342,7 @@ if __name__ == "__main__":
     parser.add_argument("-i", "--midline", default=False, action="store_true",
                         help="Report data when changes in midline [false]")
     parser.add_argument("-d", "--display", default=False, action="store_true", help="Display image [false]")
+    parser.add_argument("-p", "--port", default=50051, type=int, help="gRPC port [50051]")
     parser.add_argument("-v", "--verbose", default=logging.INFO, help="Include debugging info",
                         action="store_const", dest="loglevel", const=logging.DEBUG)
     args = vars(parser.parse_args())
