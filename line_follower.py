@@ -113,9 +113,10 @@ class LineFollower(object):
                 cv2.rectangle(focus_mask, (0, focus_line_y - 5), (img_width, focus_line_y + 5), 255, -1)
                 focus_image = cv2.bitwise_and(image, image, mask=focus_mask)
 
-                focus_contour = self.__contour_finder.get_max_contour(focus_image, 100)
-                if focus_contour is not None:
-                    focus_moment = cv2.moments(focus_contour)
+                focus_contours = self.__contour_finder.get_max_contours(focus_image, 100, count=1)
+                if focus_contours is not None:
+                    max_focus_contour = focus_contours[0]
+                    focus_moment = cv2.moments(max_focus_contour)
                     focus_area = int(focus_moment["m00"])
                     focus_img_x = int(focus_moment["m10"] / focus_area)
                     # focus_img_y = int(focus_moment["m01"] / focus_area)
@@ -123,8 +124,9 @@ class LineFollower(object):
                 text = "#{0} ({1}, {2})".format(self.__cnt, img_width, img_height)
                 text += " {0}%".format(self.__percent)
 
-                contour = self.__contour_finder.get_max_contour(image, self.__minimum)
-                if contour is not None:
+                contours = self.__contour_finder.get_max_contours(image, self.__minimum, count=1)
+                if contours is not None:
+                    contour = contours[0]
                     moment = cv2.moments(contour)
                     area = int(moment["m00"])
                     img_x = int(moment["m10"] / area)
