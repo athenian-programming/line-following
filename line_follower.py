@@ -20,6 +20,7 @@ from opencv_utils import BLUE
 from opencv_utils import GREEN
 from opencv_utils import RED
 from opencv_utils import YELLOW
+from opencv_utils import get_list_arg
 from opencv_utils import get_moment
 
 from position_server import PositionServer
@@ -335,7 +336,7 @@ if __name__ == "__main__":
     logging.basicConfig(stream=sys.stdout, level=args["loglevel"],
                         format="%(funcName)s():%(lineno)i: %(message)s %(levelname)s")
 
-    line_follower = LineFollower(eval(args["bgr"] if "[" in args["bgr"] else "[{0}]".format(args["bgr"])),
+    line_follower = LineFollower(get_list_arg(args["bgr"]),
                                  args["focus"],
                                  args["width"],
                                  args["percent"],
