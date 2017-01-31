@@ -42,6 +42,20 @@ $ line_follower.py --bgr "[174, 56, 5]" --display
 | -v, --verbose  | Include debugging info                             | false   |
 | -h, --help     | Summary of options                                 |         |
 
+### Display Keystrokes
+
+| Keystroke  | Action                                             |
+|:----------:|----------------------------------------------------|
+| k          | Move fous line up                                  |
+| j          | Move focus line down                               |
+| -          | Decrease focus line %                              |
+| +          | Increase focus line %                              |
+| w          | Decrease image size                                |
+| W          | Increase image size                                |
+| r          | Reset focus line % and image size                  |
+| s          | Save current image to disk                         |
+| q          | Quit                                               |
+
 ## Relevant Links
 
 ### Hardware

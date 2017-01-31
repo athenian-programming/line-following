@@ -1,5 +1,6 @@
 #!/usr/bin/env python2
 
+import logging
 import math
 import sys
 import time
@@ -8,12 +9,12 @@ from logging import info
 from threading import Lock
 
 import camera
+import common_cli_args  as cli
 import cv2
 import imutils
 import numpy as np
 import opencv_defaults as defs
 import opencv_utils as utils
-from common_cli_args import *
 from common_utils import is_raspi
 from contour_finder import ContourFinder
 from opencv_utils import BLUE
@@ -65,17 +66,32 @@ class LineFollower(object):
         self.__position_server = PositionServer(grpc_port)
         self.__cam = camera.Camera(use_picamera=not usb_camera)
 
-    def set_focus_line_pct(self, focus_line_pct):
+    @property
+    def focus_line_pct(self):
+        return self.__focus_line_pct
+
+    @focus_line_pct.setter
+    def focus_line_pct(self, focus_line_pct):
         if 1 <= focus_line_pct <= 99:
             self.__focus_line_pct = focus_line_pct
 
-    def set_width(self, width):
+    @property
+    def width(self):
+        return self.__width
+
+    @width.setter
+    def width(self, width):
         if 200 <= width <= 2000:
             self.__width = width
             self.__prev_focus_img_x = None
             self.__prev_mid_line_cross = None
 
-    def set_percent(self, percent):
+    @property
+    def percent(self):
+        return self.__percent
+
+    @percent.setter
+    def percent(self, percent):
         if 2 <= percent <= 98:
             self.__percent = percent
             self.__prev_focus_img_x = None
@@ -266,21 +282,21 @@ class LineFollower(object):
                     if key == 255:
                         pass
                     elif key == ord("w"):
-                        self.set_width(self.__width - 10)
+                        self.width -= 10
                     elif key == ord("W"):
-                        self.set_width(self.__width + 10)
+                        self.width += 10
                     elif key == ord("-") or key == ord("_"):
-                        self.set_percent(self.__percent - 1)
+                        self.percent -= 1
                     elif key == ord("+") or key == ord("="):
-                        self.set_percent(self.__percent + 1)
-                    elif key == ord("j"):
-                        self.set_focus_line_pct(self.__focus_line_pct - 1)
-                    elif key == ord("k"):
-                        self.set_focus_line_pct(self.__focus_line_pct + 1)
+                        self.percent += 1
+                    elif key == 1 or key == ord("j"):
+                        self.focus_line_pct -= 1
+                    elif key == 0 or key == ord("k"):
+                        self.focus_line_pct += 1
                     elif key == ord("r"):
-                        self.set_width(self.__orig_width)
-                        self.set_percent(self.__orig_percent)
-                    elif key == ord("p"):
+                        self.width = self.__orig_width
+                        self.percent = self.__orig_percent
+                    elif key == ord("s"):
                         utils.save_image(image)
                     elif key == ord("q"):
                         self.stop()
@@ -317,20 +333,20 @@ def distance(point1, point2):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    bgr(parser)
-    usb(parser)
+    parser = cli.argparse.ArgumentParser()
+    cli.bgr(parser)
+    cli.usb(parser)
     parser.add_argument("-f", "--focus", default=10, type=int, help="Focus line % from bottom [10]")
-    width(parser)
-    percent(parser)
-    min(parser)
-    range(parser)
+    cli.width(parser)
+    cli.percent(parser)
+    cli.min(parser)
+    cli.range(parser)
     parser.add_argument("-i", "--midline", default=False, action="store_true",
                         help="Report data when changes in midline [false]")
-    port(parser)
-    leds(parser)
-    display(parser)
-    verbose(parser)
+    cli.port(parser)
+    cli.leds(parser)
+    cli.display(parser)
+    cli.verbose(parser)
     args = vars(parser.parse_args())
 
     logging.basicConfig(stream=sys.stdout, level=args["loglevel"],
