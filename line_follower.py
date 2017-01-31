@@ -297,7 +297,7 @@ class LineFollower(object):
                         self.width = self.__orig_width
                         self.percent = self.__orig_percent
                     elif key == ord("s"):
-                        utils.save_image(image)
+                        utils.write_image(image, log_info=True)
                     elif key == ord("q"):
                         self.stop()
                 else:
