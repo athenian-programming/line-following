@@ -21,6 +21,7 @@ from opencv_utils import BLUE
 from opencv_utils import GREEN
 from opencv_utils import RED
 from opencv_utils import YELLOW
+from opencv_utils import get_moment
 
 from position_server import PositionServer
 
@@ -114,23 +115,15 @@ class LineFollower(object):
                 focus_image = cv2.bitwise_and(image, image, mask=focus_mask)
 
                 focus_contours = self.__contour_finder.get_max_contours(focus_image, 100, count=1)
-                if focus_contours is not None:
-                    max_focus_contour = focus_contours[0]
-                    focus_moment = cv2.moments(max_focus_contour)
-                    focus_area = int(focus_moment["m00"])
-                    focus_img_x = int(focus_moment["m10"] / focus_area)
-                    # focus_img_y = int(focus_moment["m01"] / focus_area)
+                if focus_contours is not None and len(focus_contours) == 1:
+                    max_focus_contour, focus_area, focus_img_x, focus_img_y = get_moment(cv2.moments(focus_contours[0]))
 
                 text = "#{0} ({1}, {2})".format(self.__cnt, img_width, img_height)
                 text += " {0}%".format(self.__percent)
 
                 contours = self.__contour_finder.get_max_contours(image, self.__minimum, count=1)
-                if contours is not None:
-                    contour = contours[0]
-                    moment = cv2.moments(contour)
-                    area = int(moment["m00"])
-                    img_x = int(moment["m10"] / area)
-                    img_y = int(moment["m01"] / area)
+                if contours is not None and len(contours) == 1:
+                    contour, area, img_x, img_y = get_moment(cv2.moments(contours[0]))
 
                     # if self._display:
                     # (x, y, w, h) = cv2.boundingRect(contour)
