@@ -233,7 +233,10 @@ class LineFollower(object):
                     self.__prev_focus_img_x = focus_img_x
                     self.__prev_mid_line_cross = mid_line_cross
 
-                self.set_leds(RED if focus_x_missing else (GREEN if focus_in_middle else BLUE))
+                x_color = GREEN if focus_in_middle else RED if focus_x_missing else BLUE
+
+                # Set Blinkt leds
+                self.set_leds(x_color)
 
                 if self.__display:
                     # Draw focus line
@@ -251,7 +254,6 @@ class LineFollower(object):
                     if mid_line_inter is not None and mid_line_inter <= focus_line_y:
                         cv2.circle(image, (mid_x, mid_line_inter), 6, RED, -1)
 
-                    x_color = GREEN if focus_in_middle else RED if focus_x_missing else BLUE
                     cv2.line(image, (mid_x - mid_inc, 0), (mid_x - mid_inc, img_height), x_color, 1)
                     cv2.line(image, (mid_x + mid_inc, 0), (mid_x + mid_inc, img_height), x_color, 1)
                     cv2.putText(image, text, defs.TEXT_LOC, defs.TEXT_FONT, defs.TEXT_SIZE, RED, 1)
