@@ -1,8 +1,8 @@
-import argparse
 import datetime
 import time
 from logging import info
 
+import common_cli_args  as cli
 import plotly.graph_objs as go
 import plotly.plotly as py
 import plotly.tools as tls
@@ -14,9 +14,7 @@ from position_client import PositionClient
 
 if __name__ == "__main__":
     # Parse CLI args
-    parser = argparse.ArgumentParser()
-    grpc(parser)
-    args = vars(parser.parse_args())
+    args = setup_cli_args(cli.grpc)
 
     # Setup logging
     logging.basicConfig(**LOGGING_ARGS)

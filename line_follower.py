@@ -1,6 +1,5 @@
 #!/usr/bin/env python2
 
-import argparse
 import math
 import sys
 import time
@@ -322,7 +321,6 @@ if __name__ == "__main__":
     usb(parser)
     parser.add_argument("-f", "--focus", default=10, type=int, help="Focus line % from bottom [10]")
     width(parser)
-
     percent(parser)
     min(parser)
     range(parser)
@@ -337,12 +335,12 @@ if __name__ == "__main__":
     logging.basicConfig(stream=sys.stdout, level=args["loglevel"],
                         format="%(funcName)s():%(lineno)i: %(message)s %(levelname)s")
 
-    line_follower = LineFollower(bgr_color=eval(args["bgr"] if "[" in args["bgr"] else "[{0}]".format(args["bgr"])),
-                                 focus_line_pct=args["focus"],
-                                 width=args["width"],
-                                 percent=args["percent"],
-                                 minimum=args["min"],
-                                 hsv_range=args["range"],
+    line_follower = LineFollower(eval(args["bgr"] if "[" in args["bgr"] else "[{0}]".format(args["bgr"])),
+                                 args["focus"],
+                                 args["width"],
+                                 args["percent"],
+                                 args["min"],
+                                 args["range"],
                                  grpc_port=args["port"],
                                  report_midline=args["midline"],
                                  display=args["display"],

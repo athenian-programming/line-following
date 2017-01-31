@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 
-import argparse
+import logging
 
-from common_cli_args import *
+import common_cli_args  as cli
+from common_cli_args import setup_cli_args
 from common_constants import LOGGING_ARGS
 from grpc_support import TimeoutException
 
 from position_client import PositionClient
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    grpc(parser)
-    args = vars(parser.parse_args())
+    # Parse CLI args
+    args = setup_cli_args(cli.grpc)
 
     logging.basicConfig(**LOGGING_ARGS)
 
