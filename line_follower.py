@@ -1,7 +1,6 @@
 #!/usr/bin/env python2
 
 import argparse
-import logging
 import math
 import sys
 import time
@@ -15,6 +14,7 @@ import imutils
 import numpy as np
 import opencv_defaults as defs
 import opencv_utils as utils
+from common_cli_args import *
 from common_utils import is_raspi
 from contour_finder import ContourFinder
 from opencv_utils import BLUE
@@ -318,20 +318,20 @@ def distance(point1, point2):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-b", "--bgr", type=str, required=True, help="BGR target value, e.g., -b \"174, 56, 5\"")
-    parser.add_argument("-u", "--usb", default=False, action="store_true", help="Use USB Raspi camera [false]")
+    bgr(parser)
+    usb(parser)
     parser.add_argument("-f", "--focus", default=10, type=int, help="Focus line % from bottom [10]")
-    parser.add_argument("-w", "--width", default=400, type=int, help="Image width [400]")
-    parser.add_argument("-e", "--percent", default=15, type=int, help="Middle percent [15]")
-    parser.add_argument("-m", "--min", default=100, type=int, help="Minimum pixel area [100]")
-    parser.add_argument("-r", "--range", default=20, type=int, help="HSV range")
+    width(parser)
+
+    percent(parser)
+    min(parser)
+    range(parser)
     parser.add_argument("-i", "--midline", default=False, action="store_true",
                         help="Report data when changes in midline [false]")
-    parser.add_argument("-l", "--leds", default=False, action="store_true", help="Enable Blinkt led feedback [false]")
-    parser.add_argument("-d", "--display", default=False, action="store_true", help="Display image [false]")
-    parser.add_argument("-p", "--port", default=50051, type=int, help="gRPC port [50051]")
-    parser.add_argument("-v", "--verbose", default=logging.INFO, help="Include debugging info",
-                        action="store_const", dest="loglevel", const=logging.DEBUG)
+    port(parser)
+    leds(parser)
+    display(parser)
+    verbose(parser)
     args = vars(parser.parse_args())
 
     logging.basicConfig(stream=sys.stdout, level=args["loglevel"],

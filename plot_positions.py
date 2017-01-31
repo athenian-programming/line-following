@@ -1,12 +1,12 @@
 import argparse
 import datetime
-import logging
 import time
 from logging import info
 
 import plotly.graph_objs as go
 import plotly.plotly as py
 import plotly.tools as tls
+from common_cli_args import *
 from common_constants import LOGGING_ARGS
 from grpc_support import TimeoutException
 
@@ -15,7 +15,7 @@ from position_client import PositionClient
 if __name__ == "__main__":
     # Parse CLI args
     parser = argparse.ArgumentParser()
-    parser.add_argument("-g", "--grpc", required=True, help="gRPC location server hostname")
+    grpc(parser)
     args = vars(parser.parse_args())
 
     # Setup logging
