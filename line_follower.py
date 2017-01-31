@@ -116,14 +116,14 @@ class LineFollower(object):
 
                 focus_contours = self.__contour_finder.get_max_contours(focus_image, 100, count=1)
                 if focus_contours is not None and len(focus_contours) == 1:
-                    max_focus_contour, focus_area, focus_img_x, focus_img_y = get_moment(cv2.moments(focus_contours[0]))
+                    max_focus_contour, focus_area, focus_img_x, focus_img_y = get_moment(focus_contours[0])
 
                 text = "#{0} ({1}, {2})".format(self.__cnt, img_width, img_height)
                 text += " {0}%".format(self.__percent)
 
                 contours = self.__contour_finder.get_max_contours(image, self.__minimum, count=1)
                 if contours is not None and len(contours) == 1:
-                    contour, area, img_x, img_y = get_moment(cv2.moments(contours[0]))
+                    contour, area, img_x, img_y = get_moment(contours[0])
 
                     # if self._display:
                     # (x, y, w, h) = cv2.boundingRect(contour)
