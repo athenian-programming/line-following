@@ -343,7 +343,7 @@ if __name__ == "__main__":
     cli.range(parser)
     parser.add_argument("-i", "--midline", default=False, action="store_true",
                         help="Report data when changes in midline [false]")
-    cli.port(parser)
+    cli.grpc_port(parser)
     cli.leds(parser)
     cli.display(parser)
     cli.verbose(parser)
