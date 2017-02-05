@@ -43,6 +43,9 @@ class LineFollower(object):
                  report_midline=False,
                  display=False,
                  usb_camera=False,
+                 flip_x=False,
+                 flip_y=False,
+                 camera_name="",
                  leds=False):
         self.__focus_line_pct = focus_line_pct
         self.__width = width
@@ -53,6 +56,9 @@ class LineFollower(object):
         self.__report_midline = report_midline
         self.__display = display
         self.__leds = leds
+        self.__flip_x = flip_x
+        self.__flip_y = flip_y
+        self.__camera_name = camera_name
         self.__stopped = False
 
         self.__prev_focus_img_x = -1
@@ -111,6 +117,12 @@ class LineFollower(object):
             try:
                 image = self.__cam.read()
                 image = imutils.resize(image, width=self.__width)
+
+                if self.__flip_x:
+                    image = cv2.flip(image, 0)
+
+                if self.__flip_y:
+                    image = cv2.flip(image, 1)
 
                 img_height, img_width = image.shape[:2]
 
@@ -341,6 +353,9 @@ if __name__ == "__main__":
     cli.percent(parser)
     cli.min(parser)
     cli.range(parser)
+    cli.flip_x(parser),
+    cli.flip_y(parser),
+    cli.camera_optional(parser),
     parser.add_argument("-i", "--midline", default=False, action="store_true",
                         help="Report data when changes in midline [false]")
     cli.grpc_port(parser)
@@ -361,6 +376,9 @@ if __name__ == "__main__":
                                  grpc_port=args["port"],
                                  report_midline=args["midline"],
                                  display=args["display"],
+                                 flip_x=args["flipx"],
+                                 flip_y=args["flipy"],
+                                 camera_name=args["camera"],
                                  usb_camera=args["usb"],
                                  leds=args["leds"] and is_raspi())
 
