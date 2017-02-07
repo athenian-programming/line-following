@@ -28,4 +28,4 @@ if __name__ == "__main__":
     finally:
         positions.stop()
 
-    print("Exiting...")
+    logging.info("Exiting...")

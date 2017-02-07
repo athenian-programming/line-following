@@ -68,4 +68,4 @@ if __name__ == "__main__":
         stream.close()
         positions.stop()
 
-    print("Exiting...")
+    info("Exiting...")

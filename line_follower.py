@@ -11,6 +11,7 @@ from threading import Lock
 import camera
 import common_cli_args  as cli
 import cv2
+import image_server as img_server
 import imutils
 import numpy as np
 import opencv_defaults as defs
@@ -46,7 +47,10 @@ class LineFollower(object):
                  flip_x=False,
                  flip_y=False,
                  camera_name="",
-                 leds=False):
+                 leds=False,
+                 http_host=img_server.http_host_default,
+                 http_delay_secs=img_server.http_delay_secs_default,
+                 http_file=img_server.http_file_default):
         self.__focus_line_pct = focus_line_pct
         self.__width = width
         self.__orig_percent = percent
@@ -65,12 +69,13 @@ class LineFollower(object):
         self.__prev_mid_line_cross = -1
 
         self.__cnt = 0
-        self.__lock = Lock()
-        self.__currval = None
+        self.__current_image_lock = Lock()
+        self.__current_image = None
 
         self.__contour_finder = ContourFinder(bgr_color, hsv_range)
         self.__position_server = PositionServer(grpc_port)
         self.__cam = camera.Camera(use_picamera=not usb_camera)
+        self.__http_server = img_server.ImageServer(camera_name, http_host, http_delay_secs, http_file, self.get_image)
 
     @property
     def focus_line_pct(self):
@@ -103,12 +108,20 @@ class LineFollower(object):
             self.__prev_focus_img_x = None
             self.__prev_mid_line_cross = None
 
+    def get_image(self):
+        with self.__current_image_lock:
+            if self.__current_image is None:
+                return []
+            retval, buf = utils.encode_image(self.__current_image)
+            return buf.tobytes()
+
     # Do not run this in a background thread. cv2.waitKey has to run in main thread
     def start(self):
         try:
             self.__position_server.start()
         except BaseException as e:
             logging.error("Unable to start position server [{0}]".format(e))
+            traceback.print_exc()
             sys.exit(1)
 
         self.__position_server.write_position(False, -1, -1, -1, -1, -1)
@@ -125,6 +138,9 @@ class LineFollower(object):
                     image = cv2.flip(image, 1)
 
                 img_height, img_width = image.shape[:2]
+
+                # Call once the dimensions of the images are known
+                self.__http_server.serve_images(img_width, img_height)
 
                 middle_pct = (self.__percent / 100.0) / 2
                 mid_x = img_width / 2
@@ -266,6 +282,10 @@ class LineFollower(object):
                 # Set Blinkt leds
                 self.set_leds(x_color)
 
+                if self.__http_server.is_enabled():
+                    with self.__current_image_lock:
+                        self.__current_image = image
+
                 if self.__display:
                     # Draw focus line
                     cv2.line(image, (0, focus_line_y), (img_width, focus_line_y), GREEN, 2)
@@ -312,14 +332,16 @@ class LineFollower(object):
                         utils.write_image(image, log_info=True)
                     elif key == ord("q"):
                         self.stop()
-                else:
-                    # Nap if display is not on
-                    time.sleep(.1)
 
                 self.__cnt += 1
+
+
+            except KeyboardInterrupt as e:
+                raise e
             except BaseException as e:
-                traceback.print_exc()
                 logging.error("Unexpected error in main loop [{0}]".format(e))
+                traceback.print_exc()
+                time.sleep(1)
 
         self.clear_leds()
         self.__cam.close()
@@ -327,6 +349,7 @@ class LineFollower(object):
     def stop(self):
         self.__stopped = True
         self.__position_server.stop()
+        self.__http_server.stop()
 
     def clear_leds(self):
         self.set_leds([0, 0, 0])
@@ -356,10 +379,13 @@ if __name__ == "__main__":
     cli.flip_x(parser),
     cli.flip_y(parser),
     cli.camera_optional(parser),
-    parser.add_argument("-i", "--midline", default=False, action="store_true",
+    parser.add_argument("-n", "--midline", default=False, action="store_true",
                         help="Report data when changes in midline [false]")
     cli.grpc_port(parser)
     cli.leds(parser)
+    cli.http_host(parser)
+    cli.http_delay(parser)
+    cli.http_file(parser)
     cli.display(parser)
     cli.verbose(parser)
     args = vars(parser.parse_args())
@@ -380,7 +406,10 @@ if __name__ == "__main__":
                                  flip_y=args["flipy"],
                                  camera_name=args["camera"],
                                  usb_camera=args["usb"],
-                                 leds=args["leds"] and is_raspi())
+                                 leds=args["leds"] and is_raspi(),
+                                 http_host=args["http"],
+                                 http_delay_secs=args["delay"],
+                                 http_file=args["file"])
 
     try:
         line_follower.start()

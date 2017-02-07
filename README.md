@@ -27,20 +27,23 @@ $ line_follower.py --bgr "[174, 56, 5]" --display
 
 ### CLI Options
 
-| Option         | Description                                        | Default |
-|:---------------|----------------------------------------------------|---------|
-| -b, --bgr      | BGR target value                                   |         |
-| -u, --usb      | Use USB Raspi camera                               | false   |
-| -w, --width    | Image width                                        | 400     |
-| -f, --focus    | Focus line % from bottom                           | 10      |
-| -e, --percent  | Middle percent                                     | 15      |
-| -m, --min      | Minimum target pixel area                          | 100     |
-| -r, --range    | HSV Range                                          | 20      |
-| -l, --leds     | Enable Blinkt led feedback                         | false   |
-| -d, --display  | Display image                                      | false   |
-| -p, --port     | gRPC server port                                   | 50051   |
-| -v, --verbose  | Include debugging info                             | false   |
-| -h, --help     | Summary of options                                 |         |
+| Option         | Description                                        | Default        |
+|:---------------|----------------------------------------------------|----------------|
+| -b, --bgr      | BGR target value                                   |                |
+| -u, --usb      | Use USB Raspi camera                               | false          |
+| -w, --width    | Image width                                        | 400            |
+| -f, --focus    | Focus line % from bottom                           | 10             |
+| -e, --percent  | Middle percent                                     | 15             |
+| -m, --min      | Minimum target pixel area                          | 100            |
+| -r, --range    | HSV Range                                          | 20             |
+| -l, --leds     | Enable Blinkt led feedback                         | false          |
+| -d, --display  | Display image                                      | false          |
+| -t, --http     | HTTP hostname:port                                 | localhost:8080 |
+| -s, --delay    | HTTP delay secs                                    | 0.25           |
+| -i, --file     | HTTP template file                                 |                |
+| -p, --port     | gRPC server port                                   | 50051          |
+| -v, --verbose  | Include debugging info                             | false          |
+| -h, --help     | Summary of options                                 |                |
 
 ### Display Keystrokes
 
