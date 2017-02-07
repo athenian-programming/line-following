@@ -31,6 +31,7 @@ if is_raspi():
 
 logger = logging.getLogger(__name__)
 
+
 class LineFollower(object):
     def __init__(self,
                  bgr_color,
@@ -238,21 +239,17 @@ class LineFollower(object):
                         if mid_line_cross != -1:
                             text += " Mid cross: {0}".format(mid_line_cross)
 
-                    pass
-                    # vx, vy, x, y = cv2.fitLine(contour, cv2.DIST_L2, 0, 0.01, 0.01)
-                    # lefty = int((-x * vy / vx) + y)
-                    # righty = int(((img_width - x) * vy / vx) + y)
-                    # cv2.line(image, (0, lefty), (img_width - 1, righty), GREEN, 2)
-                    # Flip this to reverse polarity
-                    # delta_y = float(lefty - righty)
-                    # delta_x = float(img_width - 1)
-                    # slope = round(delta_y / delta_x, 1)
-                    # radians = math.atan(slope)
-                    # degrees = round(math.degrees(radians), 1)
-                    # text += " {0} degrees".format(degrees)
-
-                focus_in_middle = mid_x - mid_inc <= focus_img_x <= mid_x + mid_inc if focus_img_x is not None else False
-                focus_x_missing = focus_img_x is None
+                            # vx, vy, x, y = cv2.fitLine(contour, cv2.DIST_L2, 0, 0.01, 0.01)
+                            # lefty = int((-x * vy / vx) + y)
+                            # righty = int(((img_width - x) * vy / vx) + y)
+                            # cv2.line(image, (0, lefty), (img_width - 1, righty), GREEN, 2)
+                            # Flip this to reverse polarity
+                            # delta_y = float(lefty - righty)
+                            # delta_x = float(img_width - 1)
+                            # slope = round(delta_y / delta_x, 1)
+                            # radians = math.atan(slope)
+                            # degrees = round(math.degrees(radians), 1)
+                            # text += " {0} degrees".format(degrees)
 
                 # Write position if it is different from previous value written
                 if focus_img_x != self.__prev_focus_img_x or (
@@ -266,14 +263,14 @@ class LineFollower(object):
                     self.__prev_focus_img_x = focus_img_x
                     self.__prev_mid_line_cross = mid_line_cross
 
+                focus_in_middle = mid_x - mid_inc <= focus_img_x <= mid_x + mid_inc if focus_img_x is not None else False
+                focus_x_missing = focus_img_x is None
                 x_color = GREEN if focus_in_middle else RED if focus_x_missing else BLUE
 
                 # Set Blinkt leds
                 self.set_leds(x_color)
 
-                self.__http_server.image = image
-
-                if self.__display:
+                if self.__display or self.__http_server.enabled:
                     # Draw focus line
                     cv2.line(image, (0, focus_line_y), (img_width, focus_line_y), GREEN, 2)
 
@@ -293,8 +290,10 @@ class LineFollower(object):
                     cv2.line(image, (mid_x + mid_inc, 0), (mid_x + mid_inc, img_height), x_color, 1)
                     cv2.putText(image, text, defs.TEXT_LOC, defs.TEXT_FONT, defs.TEXT_SIZE, RED, 1)
 
+                self.__http_server.image = image
+
+                if self.__display:
                     cv2.imshow("Image", image)
-                    # cv2.imshow("Focus", focus_image)
 
                     key = cv2.waitKey(30) & 0xFF
 
@@ -321,7 +320,6 @@ class LineFollower(object):
                         self.stop()
 
                 self.__cnt += 1
-
 
             except KeyboardInterrupt as e:
                 raise e
