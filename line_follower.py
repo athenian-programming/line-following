@@ -4,7 +4,6 @@ import logging
 import math
 import sys
 import time
-import traceback
 
 import camera
 import common_cli_args  as cli
@@ -111,8 +110,7 @@ class LineFollower(object):
         try:
             self.__position_server.start()
         except BaseException as e:
-            logger.error("Unable to start position server [{0}]".format(e))
-            traceback.print_exc()
+            logger.error("Unable to start position server [{0}]".format(e), exc_info=True)
             sys.exit(1)
 
         self.__position_server.write_position(False, -1, -1, -1, -1, -1)
@@ -328,8 +326,7 @@ class LineFollower(object):
             except KeyboardInterrupt as e:
                 raise e
             except BaseException as e:
-                logger.error("Unexpected error in main loop [{0}]".format(e))
-                traceback.print_exc()
+                logger.error("Unexpected error in main loop [{0}]".format(e), exc_info=True)
                 time.sleep(1)
 
         self.clear_leds()
