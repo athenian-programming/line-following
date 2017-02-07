@@ -56,7 +56,6 @@ class LineFollower(object):
         self.__orig_percent = percent
         self.__orig_width = width
         self.__percent = percent
-        self.__minimum = minimum
         self.__report_midline = report_midline
         self.__display = display
         self.__leds = leds
@@ -70,7 +69,7 @@ class LineFollower(object):
 
         self.__cnt = 0
 
-        self.__contour_finder = ContourFinder(bgr_color, hsv_range)
+        self.__contour_finder = ContourFinder(bgr_color, hsv_range, minimum)
         self.__position_server = PositionServer(grpc_port)
         self.__cam = camera.Camera(use_picamera=not usb_camera)
         self.__http_server = img_server.ImageServer(camera_name, http_host, http_delay_secs, http_file)
@@ -148,14 +147,14 @@ class LineFollower(object):
                 cv2.rectangle(focus_mask, (0, focus_line_y - 5), (img_width, focus_line_y + 5), 255, -1)
                 focus_image = cv2.bitwise_and(image, image, mask=focus_mask)
 
-                focus_contours = self.__contour_finder.get_max_contours(focus_image, 100, count=1)
+                focus_contours = self.__contour_finder.get_max_contours(focus_image, count=1)
                 if focus_contours is not None and len(focus_contours) == 1:
                     max_focus_contour, focus_area, focus_img_x, focus_img_y = get_moment(focus_contours[0])
 
                 text = "#{0} ({1}, {2})".format(self.__cnt, img_width, img_height)
                 text += " {0}%".format(self.__percent)
 
-                contours = self.__contour_finder.get_max_contours(image, self.__minimum, count=1)
+                contours = self.__contour_finder.get_max_contours(image, count=1)
                 if contours is not None and len(contours) == 1:
                     contour, area, img_x, img_y = get_moment(contours[0])
 
