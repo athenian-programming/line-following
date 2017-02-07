@@ -6,7 +6,6 @@ import sys
 import time
 import traceback
 from logging import info
-from threading import Lock
 
 import camera
 import common_cli_args  as cli
@@ -69,13 +68,11 @@ class LineFollower(object):
         self.__prev_mid_line_cross = -1
 
         self.__cnt = 0
-        self.__current_image_lock = Lock()
-        self.__current_image = None
 
         self.__contour_finder = ContourFinder(bgr_color, hsv_range)
         self.__position_server = PositionServer(grpc_port)
         self.__cam = camera.Camera(use_picamera=not usb_camera)
-        self.__http_server = img_server.ImageServer(camera_name, http_host, http_delay_secs, http_file, self.get_image)
+        self.__http_server = img_server.ImageServer(camera_name, http_host, http_delay_secs, http_file)
 
     @property
     def focus_line_pct(self):
@@ -107,13 +104,6 @@ class LineFollower(object):
             self.__percent = percent
             self.__prev_focus_img_x = None
             self.__prev_mid_line_cross = None
-
-    def get_image(self):
-        with self.__current_image_lock:
-            if self.__current_image is None:
-                return []
-            retval, buf = utils.encode_image(self.__current_image)
-            return buf.tobytes()
 
     # Do not run this in a background thread. cv2.waitKey has to run in main thread
     def start(self):
@@ -282,9 +272,7 @@ class LineFollower(object):
                 # Set Blinkt leds
                 self.set_leds(x_color)
 
-                if self.__http_server.is_enabled():
-                    with self.__current_image_lock:
-                        self.__current_image = image
+                self.__http_server.image = image
 
                 if self.__display:
                     # Draw focus line
