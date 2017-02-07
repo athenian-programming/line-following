@@ -1,6 +1,5 @@
 import datetime
 import time
-from logging import info
 
 import common_cli_args  as cli
 import plotly.graph_objs as go
@@ -11,6 +10,8 @@ from common_constants import LOGGING_ARGS
 from grpc_support import TimeoutException
 
 from position_client import PositionClient
+
+logger = logging.getLogger(__name__)
 
 if __name__ == "__main__":
     # Parse CLI args
@@ -36,7 +37,7 @@ if __name__ == "__main__":
     stream = py.Stream(stream_id)
     stream.open()
 
-    info("Opening plot.ly tab")
+    logger.info("Opening plot.ly tab")
     time.sleep(5)
 
     prev_pos = None
@@ -68,4 +69,4 @@ if __name__ == "__main__":
         stream.close()
         positions.stop()
 
-    info("Exiting...")
+    logger.info("Exiting...")

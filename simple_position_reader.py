@@ -9,6 +9,8 @@ from grpc_support import TimeoutException
 
 from position_client import PositionClient
 
+logger = logging.getLogger(__name__)
+
 if __name__ == "__main__":
     # Parse CLI args
     args = setup_cli_args(cli.grpc)
@@ -28,4 +30,4 @@ if __name__ == "__main__":
     finally:
         positions.stop()
 
-    logging.info("Exiting...")
+    logger.info("Exiting...")

@@ -1,5 +1,5 @@
+import logging
 import time
-from logging import info
 from threading import Thread
 
 import grpc
@@ -11,6 +11,7 @@ from gen.grpc_server_pb2 import FocusLinePositionServerServicer
 from gen.grpc_server_pb2 import ServerInfo
 from gen.grpc_server_pb2 import add_FocusLinePositionServerServicer_to_server
 
+logger = logging.getLogger(__name__)
 
 class PositionServer(FocusLinePositionServerServicer, GenericServer):
     def __init__(self, port):
@@ -19,7 +20,7 @@ class PositionServer(FocusLinePositionServerServicer, GenericServer):
         self._grpc_server = None
 
     def registerClient(self, request, context):
-        info("Connected to client {0} [{1}]".format(context.peer(), request.info))
+        logger.info("Connected to client {0} [{1}]".format(context.peer(), request.info))
         with self._cnt_lock:
             self._invoke_cnt += 1
         return ServerInfo(info="Server invoke count {0}".format(self._invoke_cnt))
@@ -40,7 +41,7 @@ class PositionServer(FocusLinePositionServerServicer, GenericServer):
             self._id += 1
 
     def start_position_server(self):
-        info("Starting gRPC server listening on {0}".format(self._hostname))
+        logger.info("Starting gRPC server listening on {0}".format(self._hostname))
         self._grpc_server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
         add_FocusLinePositionServerServicer_to_server(self, self._grpc_server)
         self._grpc_server.add_insecure_port(self._hostname)
@@ -54,9 +55,11 @@ class PositionServer(FocusLinePositionServerServicer, GenericServer):
             self.stop()
 
     def start(self):
+        logger.info("Starting position server")
         Thread(target=self.start_position_server).start()
         time.sleep(1)
         return self
 
     def stop(self):
+        logger.info("Stopping position server")
         self._stopped = True

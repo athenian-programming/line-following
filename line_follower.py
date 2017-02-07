@@ -5,7 +5,6 @@ import math
 import sys
 import time
 import traceback
-from logging import info
 
 import camera
 import common_cli_args  as cli
@@ -15,6 +14,7 @@ import imutils
 import numpy as np
 import opencv_defaults as defs
 import opencv_utils as utils
+from common_constants import LOGGING_ARGS
 from common_utils import is_raspi
 from contour_finder import ContourFinder
 from opencv_utils import BLUE
@@ -30,6 +30,7 @@ from position_server import PositionServer
 if is_raspi():
     from blinkt import set_pixel, show
 
+logger = logging.getLogger(__name__)
 
 class LineFollower(object):
     def __init__(self,
@@ -110,7 +111,7 @@ class LineFollower(object):
         try:
             self.__position_server.start()
         except BaseException as e:
-            logging.error("Unable to start position server [{0}]".format(e))
+            logger.error("Unable to start position server [{0}]".format(e))
             traceback.print_exc()
             sys.exit(1)
 
@@ -327,7 +328,7 @@ class LineFollower(object):
             except KeyboardInterrupt as e:
                 raise e
             except BaseException as e:
-                logging.error("Unexpected error in main loop [{0}]".format(e))
+                logger.error("Unexpected error in main loop [{0}]".format(e))
                 traceback.print_exc()
                 time.sleep(1)
 
@@ -378,8 +379,7 @@ if __name__ == "__main__":
     cli.verbose(parser)
     args = vars(parser.parse_args())
 
-    logging.basicConfig(stream=sys.stdout, level=args["loglevel"],
-                        format="%(funcName)s():%(lineno)i: %(message)s %(levelname)s")
+    logging.basicConfig(**LOGGING_ARGS)
 
     line_follower = LineFollower(get_list_arg(args["bgr"]),
                                  args["focus"],
@@ -406,4 +406,4 @@ if __name__ == "__main__":
     finally:
         line_follower.stop()
 
-    info("Exiting...")
+    logger.info("Exiting...")
