@@ -20,7 +20,6 @@ from opencv_utils import BLUE
 from opencv_utils import GREEN
 from opencv_utils import RED
 from opencv_utils import YELLOW
-from opencv_utils import get_list_arg
 from opencv_utils import get_moment
 
 from position_server import PositionServer
@@ -151,8 +150,7 @@ class LineFollower(object):
                 if focus_contours is not None and len(focus_contours) == 1:
                     max_focus_contour, focus_area, focus_img_x, focus_img_y = get_moment(focus_contours[0])
 
-                text = "#{0} ({1}, {2})".format(self.__cnt, img_width, img_height)
-                text += " {0}%".format(self.__percent)
+                text = "#{0} ({1}, {2}) {0}%".format(self.__cnt, img_width, img_height, self.__percent)
 
                 contours = self.__contour_finder.get_max_contours(image, count=1)
                 if contours is not None and len(contours) == 1:
@@ -375,7 +373,7 @@ if __name__ == "__main__":
 
     logging.basicConfig(**LOGGING_ARGS)
 
-    line_follower = LineFollower(get_list_arg(args["bgr"]),
+    line_follower = LineFollower(args["bgr"],
                                  args["focus"],
                                  args["width"],
                                  args["percent"],
