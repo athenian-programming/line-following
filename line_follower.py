@@ -5,7 +5,6 @@ import math
 import sys
 import time
 
-import camera
 import common_cli_args  as cli
 import cv2
 import image_server as img_server
@@ -13,8 +12,10 @@ import imutils
 import numpy as np
 import opencv_defaults as defs
 import opencv_utils as utils
-from common_constants import LOGGING_ARGS
+from camera import Camera
+from common_constants import logging_args
 from common_utils import is_raspi
+from common_utils import strip_loglevel
 from contour_finder import ContourFinder
 from opencv_utils import BLUE
 from opencv_utils import GREEN
@@ -36,25 +37,25 @@ class LineFollower(object):
                  bgr_color,
                  focus_line_pct,
                  width,
-                 percent,
-                 minimum,
+                 middle_percent,
+                 minimum_pixels,
                  hsv_range,
-                 grpc_port=50051,
-                 report_midline=False,
-                 display=False,
-                 usb_camera=False,
-                 flip_x=False,
-                 flip_y=False,
-                 camera_name="",
-                 leds=False,
-                 http_host=img_server.http_host_default,
-                 http_delay_secs=img_server.http_delay_secs_default,
-                 http_file=img_server.http_file_default):
+                 grpc_port,
+                 report_midline,
+                 display,
+                 usb_camera,
+                 flip_x,
+                 flip_y,
+                 camera_name,
+                 leds,
+                 http_host,
+                 http_delay_secs,
+                 http_file):
         self.__focus_line_pct = focus_line_pct
         self.__width = width
-        self.__orig_percent = percent
         self.__orig_width = width
-        self.__percent = percent
+        self.__orig_percent = middle_percent
+        self.__percent = middle_percent
         self.__report_midline = report_midline
         self.__display = display
         self.__leds = leds
@@ -68,9 +69,9 @@ class LineFollower(object):
 
         self.__cnt = 0
 
-        self.__contour_finder = ContourFinder(bgr_color, hsv_range, minimum)
+        self.__contour_finder = ContourFinder(bgr_color, hsv_range, minimum_pixels)
         self.__position_server = PositionServer(grpc_port)
-        self.__cam = camera.Camera(use_picamera=not usb_camera)
+        self.__cam = Camera(use_picamera=not usb_camera)
         self.__http_server = img_server.ImageServer(camera_name, http_host, http_delay_secs, http_file)
 
     @property
@@ -352,44 +353,29 @@ if __name__ == "__main__":
     parser = cli.argparse.ArgumentParser()
     cli.bgr(parser)
     cli.usb(parser)
-    parser.add_argument("-f", "--focus", default=10, type=int, help="Focus line % from bottom [10]")
+    parser.add_argument("-f", "--focus", default=10, type=int, dest="focus_line_pct",
+                        help="Focus line % from bottom [10]")
     cli.width(parser)
-    cli.percent(parser)
-    cli.min(parser)
-    cli.range(parser)
+    cli.middle_percent(parser)
+    cli.minimum_pixels(parser)
+    cli.hsv_range(parser)
     cli.flip_x(parser),
     cli.flip_y(parser),
-    cli.camera_optional(parser),
-    parser.add_argument("-n", "--midline", default=False, action="store_true",
+    cli.camera_name_optional(parser),
+    parser.add_argument("-n", "--midline", default=False, action="store_true", dest="report_midline",
                         help="Report data when changes in midline [false]")
     cli.grpc_port(parser)
     cli.leds(parser)
     cli.http_host(parser)
-    cli.http_delay(parser)
+    cli.http_delay_secs(parser)
     cli.http_file(parser)
     cli.display(parser)
     cli.verbose(parser)
     args = vars(parser.parse_args())
 
-    logging.basicConfig(**LOGGING_ARGS)
+    logging.basicConfig(**logging_args(args["loglevel"]))
 
-    line_follower = LineFollower(args["bgr"],
-                                 args["focus"],
-                                 args["width"],
-                                 args["percent"],
-                                 args["min"],
-                                 args["range"],
-                                 grpc_port=args["port"],
-                                 report_midline=args["midline"],
-                                 display=args["display"],
-                                 flip_x=args["flipx"],
-                                 flip_y=args["flipy"],
-                                 camera_name=args["camera"],
-                                 usb_camera=args["usb"],
-                                 leds=args["leds"] and is_raspi(),
-                                 http_host=args["http"],
-                                 http_delay_secs=args["delay"],
-                                 http_file=args["file"])
+    line_follower = LineFollower(**strip_loglevel(args))
 
     try:
         line_follower.start()

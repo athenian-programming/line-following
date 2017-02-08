@@ -61,5 +61,6 @@ class PositionServer(FocusLinePositionServerServicer, GenericServer):
         return self
 
     def stop(self):
-        logger.info("Stopping position server")
-        self._stopped = True
+        if not self._stopped:
+            logger.info("Stopping position server")
+            self._stopped = True
