@@ -2,10 +2,10 @@
 
 import logging
 
-import common_cli_args  as cli
-from common_cli_args import setup_cli_args
-from common_constants import LOGGING_ARGS
+import cli_args  as cli
+from cli_args import setup_cli_args
 from grpc_support import TimeoutException
+from utils import setup_logging
 
 from position_client import PositionClient
 
@@ -13,9 +13,10 @@ logger = logging.getLogger(__name__)
 
 if __name__ == "__main__":
     # Parse CLI args
-    args = setup_cli_args(cli.grpc_host)
+    args = setup_cli_args(cli.grpc_host, cli.verbose)
 
-    logging.basicConfig(**LOGGING_ARGS)
+    # Setup logging
+    setup_logging(args["loglevel"])
 
     positions = PositionClient(args["grpc_host"]).start()
 

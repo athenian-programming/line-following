@@ -1,11 +1,12 @@
 #!/usr/bin/env python2
+from __future__ import absolute_import
 
 import logging
 import math
 import sys
 import time
 
-import common_cli_args  as cli
+import cli_args  as cli
 import cv2
 import image_server as img_server
 import imutils
@@ -13,15 +14,15 @@ import numpy as np
 import opencv_defaults as defs
 import opencv_utils as utils
 from camera import Camera
-from common_constants import logging_args
-from common_utils import is_raspi
-from common_utils import strip_loglevel
 from contour_finder import ContourFinder
 from opencv_utils import BLUE
 from opencv_utils import GREEN
 from opencv_utils import RED
 from opencv_utils import YELLOW
 from opencv_utils import get_moment
+from utils import is_raspi
+from utils import setup_logging
+from utils import strip_loglevel
 
 from position_server import PositionServer
 
@@ -350,6 +351,7 @@ def distance(point1, point2):
 
 
 if __name__ == "__main__":
+    # Parse CLI args
     parser = cli.argparse.ArgumentParser()
     cli.bgr(parser)
     cli.usb(parser)
@@ -373,7 +375,8 @@ if __name__ == "__main__":
     cli.verbose(parser)
     args = vars(parser.parse_args())
 
-    logging.basicConfig(**logging_args(args["loglevel"]))
+    # Setup logging
+    setup_logging(args["loglevel"])
 
     line_follower = LineFollower(**strip_loglevel(args))
 

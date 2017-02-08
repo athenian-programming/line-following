@@ -1,9 +1,8 @@
-import logging
 import time
 from threading import Thread
 
-from common_constants import LOGGING_ARGS
-from common_utils import sleep
+from utils import setup_logging
+from utils import sleep
 
 from position_server import PositionServer
 
@@ -21,6 +20,6 @@ def test_position_server(port):
 
 
 if __name__ == "__main__":
-    logging.basicConfig(**LOGGING_ARGS)
+    setup_logging()
     Thread(target=test_position_server, args=(50052,)).start()
     sleep()

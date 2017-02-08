@@ -1,12 +1,11 @@
 from __future__ import print_function
 
-import logging
 import socket
 from threading import Thread
 
 import grpc
-from common_constants import LOGGING_ARGS
-from common_utils import sleep
+from utils import setup_logging
+from utils import sleep
 
 from gen.grpc_server_pb2 import ClientInfo
 from gen.grpc_server_pb2 import FocusLinePositionServerStub
@@ -25,6 +24,6 @@ def read_positions(hostname):
 
 
 if __name__ == "__main__":
-    logging.basicConfig(**LOGGING_ARGS)
+    setup_logging()
     Thread(target=read_positions, args=("localhost:50052",)).start()
     sleep()
