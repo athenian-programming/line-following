@@ -73,7 +73,7 @@ class LineFollower(object):
         self.__contour_finder = ContourFinder(bgr_color, hsv_range, minimum_pixels)
         self.__position_server = PositionServer(grpc_port)
         self.__cam = Camera(use_picamera=not usb_camera)
-        self.__http_server = img_server.ImageServer(camera_name, http_host, http_delay_secs, http_file)
+        self.__image_server = img_server.ImageServer(camera_name, http_host, http_delay_secs, http_file)
 
     @property
     def focus_line_pct(self):
@@ -130,7 +130,7 @@ class LineFollower(object):
                 img_height, img_width = image.shape[:2]
 
                 # Call once the dimensions of the images are known
-                self.__http_server.serve_images(img_width, img_height)
+                self.__image_server.start(image)
 
                 middle_pct = (self.__percent / 100.0) / 2
                 mid_x = img_width / 2
@@ -269,7 +269,7 @@ class LineFollower(object):
                 # Set Blinkt leds
                 self.set_leds(x_color)
 
-                if self.__display or self.__http_server.enabled:
+                if self.__display or self.__image_server.enabled:
                     # Draw focus line
                     cv2.line(image, (0, focus_line_y), (img_width, focus_line_y), GREEN, 2)
 
@@ -289,7 +289,7 @@ class LineFollower(object):
                     cv2.line(image, (mid_x + mid_inc, 0), (mid_x + mid_inc, img_height), x_color, 1)
                     cv2.putText(image, text, defs.TEXT_LOC, defs.TEXT_FONT, defs.TEXT_SIZE, RED, 1)
 
-                self.__http_server.image = image
+                self.__image_server.image = image
 
                 if self.__display:
                     cv2.imshow("Image", image)
@@ -332,7 +332,7 @@ class LineFollower(object):
     def stop(self):
         self.__stopped = True
         self.__position_server.stop()
-        self.__http_server.stop()
+        self.__image_server.stop()
 
     def clear_leds(self):
         self.set_leds([0, 0, 0])
