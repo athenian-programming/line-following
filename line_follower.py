@@ -51,7 +51,8 @@ class LineFollower(object):
                  leds,
                  http_host,
                  http_delay_secs,
-                 http_file):
+                 http_file,
+                 http_verbose):
         self.__focus_line_pct = focus_line_pct
         self.__width = width
         self.__orig_width = width
@@ -73,7 +74,7 @@ class LineFollower(object):
         self.__contour_finder = ContourFinder(bgr_color, hsv_range, minimum_pixels)
         self.__position_server = PositionServer(grpc_port)
         self.__cam = Camera(use_picamera=not usb_camera)
-        self.__image_server = img_server.ImageServer(camera_name, http_host, http_delay_secs, http_file)
+        self.__image_server = img_server.ImageServer(http_file, camera_name, http_host, http_delay_secs, http_verbose)
 
     @property
     def focus_line_pct(self):
@@ -353,23 +354,24 @@ if __name__ == "__main__":
     parser = cli.argparse.ArgumentParser()
     cli.bgr(parser)
     cli.usb(parser)
+    cli.width(parser)
     parser.add_argument("-f", "--focus", default=10, type=int, dest="focus_line_pct",
                         help="Focus line % from bottom [10]")
-    cli.width(parser)
+    parser.add_argument("-n", "--midline", default=False, action="store_true", dest="report_midline",
+                        help="Report data when changes in midline [false]")
     cli.middle_percent(parser)
     cli.minimum_pixels(parser)
     cli.hsv_range(parser)
     cli.flip_x(parser),
     cli.flip_y(parser),
     cli.camera_name_optional(parser),
-    parser.add_argument("-n", "--midline", default=False, action="store_true", dest="report_midline",
-                        help="Report data when changes in midline [false]")
+    cli.display(parser)
     cli.grpc_port(parser)
     cli.leds(parser)
     cli.http_host(parser)
     cli.http_delay_secs(parser)
     cli.http_file(parser)
-    cli.display(parser)
+    cli.verbose_http(parser)
     cli.verbose(parser)
     args = vars(parser.parse_args())
 
