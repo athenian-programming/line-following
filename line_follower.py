@@ -114,7 +114,7 @@ class LineFollower(object):
             logger.error("Unable to start position server [{0}]".format(e), exc_info=True)
             sys.exit(1)
 
-        self.__position_server.write_position(False, -1, -1, -1, -1, -1)
+        self.__image_server.start()
 
         while self.__cam.is_open() and not self.__stopped:
             try:
@@ -129,8 +129,6 @@ class LineFollower(object):
 
                 img_height, img_width = image.shape[:2]
 
-                # Call once the dimensions of the images are known
-                self.__image_server.start(image)
 
                 middle_pct = (self.__percent / 100.0) / 2
                 mid_x = img_width / 2

@@ -56,6 +56,7 @@ class PositionServer(FocusLinePositionServerServicer, GenericServer):
 
     def start(self):
         logger.info("Starting position server")
+        self.write_position(False, -1, -1, -1, -1, -1)
         Thread(target=self._start_position_server).start()
         time.sleep(1)
         return self
