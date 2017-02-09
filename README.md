@@ -42,7 +42,8 @@ $ line_follower.py --bgr "[174, 56, 5]" --display
 | -s, --delay    | HTTP delay secs                                    | 0.25           |
 | -i, --file     | HTTP template file                                 |                |
 | -p, --port     | gRPC server port                                   | 50051          |
-| -v, --verbose  | Include debugging info                             | false          |
+| -o, --verbose-http | Enable verbose HTTP log                        | false          |
+| -v, --verbose  | Enable debugging output                            | false          |
 | -h, --help     | Summary of options                                 |                |
 
 ### Display Keystrokes
