@@ -40,7 +40,7 @@ class PositionServer(FocusLinePositionServerServicer, GenericServer):
                                                middle_inc=middle_inc))
             self._id += 1
 
-    def start_position_server(self):
+    def _start_position_server(self):
         logger.info("Starting gRPC server listening on {0}".format(self._hostname))
         self._grpc_server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
         add_FocusLinePositionServerServicer_to_server(self, self._grpc_server)
@@ -56,7 +56,7 @@ class PositionServer(FocusLinePositionServerServicer, GenericServer):
 
     def start(self):
         logger.info("Starting position server")
-        Thread(target=self.start_position_server).start()
+        Thread(target=self._start_position_server).start()
         time.sleep(1)
         return self
 
