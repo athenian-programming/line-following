@@ -22,7 +22,7 @@ as described [here](http://www.athenian-robotics.org/numpy/)
 ### Usage 
 
 ```bash
-$ line_follower.py --bgr "[174, 56, 5]" --display 
+$ line_follower.py --bgr "174, 56, 5" --display 
 ```
 
 ### CLI Options
