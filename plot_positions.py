@@ -6,6 +6,7 @@ import cli_args  as cli
 import plotly.graph_objs as go
 import plotly.plotly as py
 import plotly.tools as tls
+from constants import LOG_LEVEL, GRPC_HOST
 from grpc_support import TimeoutException
 from utils import setup_logging
 
@@ -18,10 +19,10 @@ if __name__ == "__main__":
     args = cli.setup_cli_args(cli.grpc_host, cli.verbose)
 
     # Setup logging
-    setup_logging(level=args["loglevel"])
+    setup_logging(level=args[LOG_LEVEL])
 
     # Start position client
-    positions = PositionClient(args["grpc_host"]).start()
+    positions = PositionClient(args[GRPC_HOST]).start()
 
     stream_ids = tls.get_credentials_file()['stream_ids']
     stream_id = stream_ids[1]

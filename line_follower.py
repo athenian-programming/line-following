@@ -14,6 +14,7 @@ import numpy as np
 import opencv_defaults as defs
 import opencv_utils as utils
 from camera import Camera
+from constants import LOG_LEVEL
 from contour_finder import ContourFinder
 from opencv_utils import BLUE
 from opencv_utils import GREEN
@@ -376,7 +377,7 @@ if __name__ == "__main__":
     args = vars(parser.parse_args())
 
     # Setup logging
-    setup_logging(level=args["loglevel"])
+    setup_logging(level=args[LOG_LEVEL])
 
     line_follower = LineFollower(**strip_loglevel(args))
 
