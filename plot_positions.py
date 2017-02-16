@@ -1,11 +1,11 @@
 import datetime
+import logging
 import time
 
 import cli_args  as cli
 import plotly.graph_objs as go
 import plotly.plotly as py
 import plotly.tools as tls
-from cli_args import *
 from grpc_support import TimeoutException
 from utils import setup_logging
 
@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 if __name__ == "__main__":
     # Parse CLI args
-    args = setup_cli_args(cli.grpc_host, cli.verbose)
+    args = cli.setup_cli_args(cli.grpc_host, cli.verbose)
 
     # Setup logging
     setup_logging(level=args["loglevel"])
