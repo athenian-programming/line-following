@@ -21,7 +21,7 @@ from opencv_utils import GREEN
 from opencv_utils import RED
 from opencv_utils import YELLOW
 from opencv_utils import get_moment
-from utils import is_raspi
+from utils import is_raspi, distance
 from utils import setup_logging
 from utils import strip_loglevel
 
@@ -342,12 +342,6 @@ class LineFollower(object):
             for i in range(0, 8):
                 set_pixel(i, color[2], color[1], color[0], brightness=0.05)
             show()
-
-
-def distance(point1, point2):
-    xsqr = (point2[0] - point1[0]) ** 2
-    ysqr = (point2[1] - point1[1]) ** 2
-    return int(math.sqrt(xsqr + ysqr))
 
 
 if __name__ == "__main__":
