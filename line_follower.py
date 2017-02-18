@@ -2,7 +2,6 @@
 from __future__ import absolute_import
 
 import logging
-import math
 import sys
 import time
 
@@ -21,7 +20,7 @@ from opencv_utils import GREEN
 from opencv_utils import RED
 from opencv_utils import YELLOW
 from opencv_utils import get_moment
-from utils import is_raspi, distance
+from utils import is_raspi
 from utils import setup_logging
 from utils import strip_loglevel
 
@@ -131,7 +130,6 @@ class LineFollower(object):
 
                 img_height, img_width = image.shape[:2]
 
-
                 middle_pct = (self.__percent / 100.0) / 2
                 mid_x = img_width / 2
                 mid_y = img_height / 2
@@ -164,42 +162,7 @@ class LineFollower(object):
                     # cv2.drawContours(frame, [contour], -1, GREEN, 2)
                     # cv2.circle(frame, (img_x, img_y), 4, RED, -1)
 
-                    rect = cv2.minAreaRect(contour)
-                    box = cv2.boxPoints(rect)
-
-                    # if self.__display:
-                    #    cv2.drawContours(image, [np.int0(box)], 0, RED, 2)
-
-                    point_lr = box[0]
-                    point_ll = box[1]
-                    point_ul = box[2]
-                    point_ur = box[3]
-
-                    line1 = distance(point_lr, point_ur)
-                    line2 = distance(point_ur, point_ul)
-
-                    if line1 < line2:
-                        point_lr = box[1]
-                        point_ll = box[2]
-                        point_ul = box[3]
-                        point_ur = box[0]
-                        line_width = line1
-                    else:
-                        line_width = line2
-
-                    delta_y = point_lr[1] - point_ur[1]
-                    delta_x = point_lr[0] - point_ur[0]
-
-                    # Calculate angle of line
-                    if delta_x == 0:
-                        # Vertical line
-                        slope = None
-                        degrees = 90
-                    else:
-                        # Non-vertical line
-                        slope = delta_y / delta_x
-                        radians = math.atan(slope)
-                        degrees = int(math.degrees(radians)) * -1
+                    slope, degrees = utils.contour_slope_degrees(contour)
 
                     # Draw line for slope
                     if slope is None:
