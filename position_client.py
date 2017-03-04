@@ -1,11 +1,16 @@
+from __future__ import print_function
+
 import logging
 import socket
 import time
 from threading import Event
+from threading import Thread
 
 import grpc
 from grpc_support import GenericClient
 from grpc_support import TimeoutException
+from utils import setup_logging
+from utils import sleep
 
 from gen.grpc_server_pb2 import ClientInfo
 from gen.grpc_server_pb2 import FocusLinePositionServerStub
@@ -72,3 +77,21 @@ class PositionClient(GenericClient):
                             "mid_cross": self.__mid_cross,
                             "width": self.__width,
                             "middle_inc": self.__middle_inc}
+
+
+if __name__ == "__main__":
+    def _run_client(hostname):
+        channel = grpc.insecure_channel(hostname)
+        stub = FocusLinePositionServerStub(channel)
+        client_info = ClientInfo(info="{0} client".format(socket.gethostname()))
+        server_info = stub.registerClient(client_info)
+
+        for pos in stub.getFocusLinePositions(client_info):
+            print("Received position {0}".format(pos))
+
+        print("Disconnected from gRPC server at {0}".format(hostname))
+
+
+    setup_logging()
+    Thread(target=_run_client, args=("localhost:50052",)).start()
+    sleep()

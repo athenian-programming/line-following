@@ -1,9 +1,12 @@
 import logging
 import time
+from threading import Thread
 
 import grpc
 from concurrent import futures
 from grpc_support import GenericServer
+from utils import setup_logging
+from utils import sleep
 
 from gen.grpc_server_pb2 import FocusLinePosition
 from gen.grpc_server_pb2 import FocusLinePositionServerServicer
@@ -12,6 +15,7 @@ from gen.grpc_server_pb2 import add_FocusLinePositionServerServicer_to_server
 
 logger = logging.getLogger(__name__)
 
+
 class PositionServer(FocusLinePositionServerServicer, GenericServer):
     def __init__(self, port):
         super(PositionServer, self).__init__(port, "position server")
@@ -19,9 +23,7 @@ class PositionServer(FocusLinePositionServerServicer, GenericServer):
 
     def registerClient(self, request, context):
         logger.info("Connected to {0} client {1} [{2}]".format(self.desc, context.peer(), request.info))
-        with self.cnt_lock:
-            self._invoke_cnt += 1
-        return ServerInfo(info="Server invoke count {0}".format(self._invoke_cnt))
+        return ServerInfo(info="Server invoke count {0}".format(self.increment_cnt()))
 
     def getFocusLinePositions(self, request, context):
         client_info = request.info
@@ -54,3 +56,21 @@ class PositionServer(FocusLinePositionServerServicer, GenericServer):
                                                width=width,
                                                middle_inc=middle_inc))
             self._id += 1
+
+
+if __name__ == "__main__":
+    def _run_server(port):
+        server = PositionServer(port).start()
+        for i in range(100):
+            server.write_position(in_focus=True if i % 2 == 0 else False,
+                                  mid_offset=i,
+                                  degrees=i + 1,
+                                  mid_line_cross=i + 2,
+                                  width=i + 3,
+                                  middle_inc=i + 4)
+            time.sleep(1)
+
+
+    setup_logging()
+    Thread(target=_run_server, args=(50052,)).start()
+    sleep()
