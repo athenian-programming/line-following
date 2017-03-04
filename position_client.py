@@ -25,15 +25,14 @@ class PositionClient(GenericClient):
         self.__mid_cross = -1
         self.__width = -1
         self.__middle_inc = -1
-        self._stopped = False
 
     # Blocking
     def get_position(self, timeout=None):
-        while not self._stopped:
+        while not self.stopped:
             if not self.__ready.wait(timeout):
                 raise TimeoutException
             with self._lock:
-                if self.__ready.is_set() and not self._stopped:
+                if self.__ready.is_set() and not self.stopped:
                     self.__ready.clear()
                     return {"id": self.__id,
                             "in_focus": self.__in_focus,
@@ -46,7 +45,7 @@ class PositionClient(GenericClient):
     def read_positions(self, pause_secs=2.0):
         channel = grpc.insecure_channel(self._hostname)
         stub = FocusLinePositionServerStub(channel)
-        while not self._stopped:
+        while not self.stopped:
             logger.info("Connecting to gRPC server at {0}...".format(self._hostname))
             try:
                 client_info = ClientInfo(info="{0} client".format(socket.gethostname()))
@@ -78,7 +77,7 @@ class PositionClient(GenericClient):
         return self
 
     def stop(self):
-        if not self._stopped:
+        if not self.stopped:
             logger.info("Stopping position client")
-            self._stopped = True
+            self.stopped = True
             self.__ready.set()

@@ -73,7 +73,7 @@ class LineFollower(object):
 
         self.__contour_finder = ContourFinder(bgr_color, hsv_range, minimum_pixels)
         self.__position_server = PositionServer(grpc_port)
-        self.__cam = Camera(use_picamera=not usb_camera)
+        self.__cam = Camera(usb_camera=usb_camera)
         self.__image_server = img_server.ImageServer(http_file, camera_name, http_host, http_delay_secs, http_verbose)
 
     @property
@@ -329,7 +329,7 @@ if __name__ == "__main__":
     cli.http_host(parser)
     cli.http_delay_secs(parser)
     cli.http_file(parser)
-    cli.verbose_http(parser)
+    cli.http_verbose(parser)
     cli.verbose(parser)
     args = vars(parser.parse_args())
 

@@ -15,12 +15,11 @@ logger = logging.getLogger(__name__)
 
 class PositionServer(FocusLinePositionServerServicer, GenericServer):
     def __init__(self, port):
-        super(PositionServer, self).__init__(port)
-        self._stopped = False
+        super(PositionServer, self).__init__(port, "position server")
         self._grpc_server = None
 
     def registerClient(self, request, context):
-        logger.info("Connected to client {0} [{1}]".format(context.peer(), request.info))
+        logger.info("Connected to {0} client {1} [{2}]".format(self.desc, context.peer(), request.info))
         with self._cnt_lock:
             self._invoke_cnt += 1
         return ServerInfo(info="Server invoke count {0}".format(self._invoke_cnt))
@@ -30,7 +29,7 @@ class PositionServer(FocusLinePositionServerServicer, GenericServer):
         return self.currval_generator(context.peer())
 
     def write_position(self, in_focus, mid_offset, degrees, mid_line_cross, width, middle_inc):
-        if not self._stopped:
+        if not self.stopped:
             self.set_currval(FocusLinePosition(id=self._id,
                                                in_focus=in_focus,
                                                mid_offset=mid_offset,
@@ -41,13 +40,13 @@ class PositionServer(FocusLinePositionServerServicer, GenericServer):
             self._id += 1
 
     def _start_position_server(self):
-        logger.info("Starting gRPC server listening on {0}".format(self._hostname))
+        logger.info("Starting gRPC {0} listening on {1}".format(self.desc, self._hostname))
         self._grpc_server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
         add_FocusLinePositionServerServicer_to_server(self, self._grpc_server)
         self._grpc_server.add_insecure_port(self._hostname)
         self._grpc_server.start()
         try:
-            while not self._stopped:
+            while not self.stopped:
                 time.sleep(1)
         except KeyboardInterrupt:
             pass
@@ -55,13 +54,8 @@ class PositionServer(FocusLinePositionServerServicer, GenericServer):
             self.stop()
 
     def start(self):
-        logger.info("Starting position server")
+        logger.info("Starting {0}".format(self.desc))
         self.write_position(False, -1, -1, -1, -1, -1)
         Thread(target=self._start_position_server).start()
         time.sleep(1)
         return self
-
-    def stop(self):
-        if not self._stopped:
-            logger.info("Stopping position server")
-            self._stopped = True
