@@ -1,12 +1,10 @@
 import logging
 import time
-from threading import Thread
 
 import grpc
 from concurrent import futures
 from grpc_support import GenericServer
 from utils import setup_logging
-from utils import sleep
 
 from gen.grpc_server_pb2 import FocusLinePosition
 from gen.grpc_server_pb2 import FocusLinePositionServerServicer
@@ -17,9 +15,9 @@ logger = logging.getLogger(__name__)
 
 
 class PositionServer(FocusLinePositionServerServicer, GenericServer):
-    def __init__(self, port):
-        super(PositionServer, self).__init__(port, "position server")
-        self._grpc_server = None
+    def __init__(self, port=None):
+        super(PositionServer, self).__init__(port=port, desc="position server")
+        self.grpc_server = None
 
     def registerClient(self, request, context):
         logger.info("Connected to {0} client {1} [{2}]".format(self.desc, context.peer(), request.info))
@@ -33,11 +31,11 @@ class PositionServer(FocusLinePositionServerServicer, GenericServer):
         self.write_position(False, -1, -1, -1, -1, -1)
 
     def _start_server(self):
-        logger.info("Starting gRPC {0} listening on {1}".format(self.desc, self._hostname))
-        self._grpc_server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-        add_FocusLinePositionServerServicer_to_server(self, self._grpc_server)
-        self._grpc_server.add_insecure_port(self._hostname)
-        self._grpc_server.start()
+        logger.info("Starting gRPC {0} listening on {1}".format(self.desc, self.hostname))
+        self.grpc_server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
+        add_FocusLinePositionServerServicer_to_server(self, self.grpc_server)
+        self.grpc_server.add_insecure_port(self.hostname)
+        self.grpc_server.start()
         try:
             while not self.stopped:
                 time.sleep(1)
@@ -48,29 +46,24 @@ class PositionServer(FocusLinePositionServerServicer, GenericServer):
 
     def write_position(self, in_focus, mid_offset, degrees, mid_line_cross, width, middle_inc):
         if not self.stopped:
-            self.set_currval(FocusLinePosition(id=self._id,
+            self.set_currval(FocusLinePosition(id=self.id,
                                                in_focus=in_focus,
                                                mid_offset=mid_offset,
                                                degrees=degrees,
                                                mid_line_cross=mid_line_cross,
                                                width=width,
                                                middle_inc=middle_inc))
-            self._id += 1
+            self.id += 1
 
 
 if __name__ == "__main__":
-    def _run_server(port):
-        server = PositionServer(port).start()
-        for i in range(100):
-            server.write_position(in_focus=True if i % 2 == 0 else False,
-                                  mid_offset=i,
-                                  degrees=i + 1,
-                                  mid_line_cross=i + 2,
-                                  width=i + 3,
-                                  middle_inc=i + 4)
-            time.sleep(1)
-
-
     setup_logging()
-    Thread(target=_run_server, args=(50052,)).start()
-    sleep()
+    server = PositionServer().start()
+    for i in range(100):
+        server.write_position(in_focus=True if i % 2 == 0 else False,
+                              mid_offset=i,
+                              degrees=i + 1,
+                              mid_line_cross=i + 2,
+                              width=i + 3,
+                              middle_inc=i + 4)
+        time.sleep(1)

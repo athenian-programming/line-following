@@ -46,13 +46,13 @@ if __name__ == "__main__":
     try:
         while True:
             try:
-                pos = positions.get_position(timeout=0.5)
+                val = positions.get_position(timeout=0.5)
 
-                if not pos["in_focus"]:
+                if not val.in_focus:
                     prev_pos = None
                     continue
 
-                y = pos["mid_offset"]
+                y = val.mid_offset
                 prev_pos = y
 
             # No change in value
