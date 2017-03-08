@@ -12,7 +12,7 @@ from grpc_support import TimeoutException
 from utils import setup_logging
 
 from gen.grpc_server_pb2 import ClientInfo
-from gen.grpc_server_pb2 import FocusLinePositionServerStub
+from gen.grpc_server_pb2 import PositionServerStub
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +28,7 @@ class PositionClient(GenericClient):
 
     def _get_values(self, pause_secs=2.0):
         channel = grpc.insecure_channel(self.hostname)
-        stub = FocusLinePositionServerStub(channel)
+        stub = PositionServerStub(channel)
         while not self.stopped:
             logger.info("Connecting to gRPC server at {0}...".format(self.hostname))
             try:
@@ -41,7 +41,7 @@ class PositionClient(GenericClient):
 
             logger.info("Connected to gRPC server at {0} [{1}]".format(self.hostname, server_info.info))
             try:
-                for val in stub.getFocusLinePositions(client_info):
+                for val in stub.getPositions(client_info):
                     with self.value_lock:
                         self.__currval = copy.deepcopy(val)
                     self._mark_ready()
@@ -62,13 +62,8 @@ class PositionClient(GenericClient):
 
 if __name__ == "__main__":
     setup_logging()
-
-    channel = grpc.insecure_channel("localhost")
-    stub = FocusLinePositionServerStub(channel)
-    client_info = ClientInfo(info="{0} client".format(socket.gethostname()))
-    server_info = stub.registerClient(client_info)
-
-    for val in stub.getFocusLinePositions(client_info):
-        print("Received position {0}".format(val))
-
-    print("Disconnected from gRPC server")
+    client = PositionClient("localhost").start()
+    for i in range(1000):
+        logger.info("Read value:\n{0}".format(client.get_position()))
+    client.stop()
+    logger.info("Exiting...")

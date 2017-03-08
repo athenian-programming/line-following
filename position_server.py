@@ -6,15 +6,15 @@ from concurrent import futures
 from grpc_support import GenericServer
 from utils import setup_logging
 
-from gen.grpc_server_pb2 import FocusLinePosition
-from gen.grpc_server_pb2 import FocusLinePositionServerServicer
+from gen.grpc_server_pb2 import Position
+from gen.grpc_server_pb2 import PositionServerServicer
 from gen.grpc_server_pb2 import ServerInfo
-from gen.grpc_server_pb2 import add_FocusLinePositionServerServicer_to_server
+from gen.grpc_server_pb2 import add_PositionServerServicer_to_server
 
 logger = logging.getLogger(__name__)
 
 
-class PositionServer(FocusLinePositionServerServicer, GenericServer):
+class PositionServer(PositionServerServicer, GenericServer):
     def __init__(self, port=None):
         super(PositionServer, self).__init__(port=port, desc="position server")
         self.grpc_server = None
@@ -23,7 +23,7 @@ class PositionServer(FocusLinePositionServerServicer, GenericServer):
         logger.info("Connected to {0} client {1} [{2}]".format(self.desc, context.peer(), request.info))
         return ServerInfo(info="Server invoke count {0}".format(self.increment_cnt()))
 
-    def getFocusLinePositions(self, request, context):
+    def getPositions(self, request, context):
         client_info = request.info
         return self.currval_generator(context.peer())
 
@@ -33,7 +33,7 @@ class PositionServer(FocusLinePositionServerServicer, GenericServer):
     def _start_server(self):
         logger.info("Starting gRPC {0} listening on {1}".format(self.desc, self.hostname))
         self.grpc_server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-        add_FocusLinePositionServerServicer_to_server(self, self.grpc_server)
+        add_PositionServerServicer_to_server(self, self.grpc_server)
         self.grpc_server.add_insecure_port(self.hostname)
         self.grpc_server.start()
         try:
@@ -46,13 +46,13 @@ class PositionServer(FocusLinePositionServerServicer, GenericServer):
 
     def write_position(self, in_focus, mid_offset, degrees, mid_line_cross, width, middle_inc):
         if not self.stopped:
-            self.set_currval(FocusLinePosition(id=self.id,
-                                               in_focus=in_focus,
-                                               mid_offset=mid_offset,
-                                               degrees=degrees,
-                                               mid_line_cross=mid_line_cross,
-                                               width=width,
-                                               middle_inc=middle_inc))
+            self.set_currval(Position(id=self.id,
+                                      in_focus=in_focus,
+                                      mid_offset=mid_offset,
+                                      degrees=degrees,
+                                      mid_line_cross=mid_line_cross,
+                                      width=width,
+                                      middle_inc=middle_inc))
             self.id += 1
 
 

@@ -2,12 +2,12 @@ syntax = "proto3";
 
 package opencv_object_tracking;
 
-service FocusLinePositionServer {
+service PositionServer {
 
     rpc registerClient (ClientInfo) returns (ServerInfo) {
     }
 
-    rpc getFocusLinePositions (ClientInfo) returns (stream FocusLinePosition) {
+    rpc getPositions (ClientInfo) returns (stream Position) {
     }
 
 }
@@ -20,7 +20,7 @@ message ServerInfo {
     string info = 1;
 }
 
-message FocusLinePosition {
+message Position {
     int32 id = 1;
     bool in_focus = 2;
     int32 mid_offset = 3;
