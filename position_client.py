@@ -11,8 +11,8 @@ from grpc_support import GenericClient
 from grpc_support import TimeoutException
 from utils import setup_logging
 
-from gen.grpc_server_pb2 import ClientInfo
-from gen.grpc_server_pb2 import PositionServerStub
+from pb.position_server_pb2 import ClientInfo
+from pb.position_server_pb2 import PositionServerStub
 
 logger = logging.getLogger(__name__)
 
@@ -59,11 +59,14 @@ class PositionClient(GenericClient):
                     self.__ready.clear()
                     return self.__currval
 
+    def get_positions(self):
+        while not self.stopped:
+            yield self.get_position()
+
 
 if __name__ == "__main__":
     setup_logging()
-    client = PositionClient("localhost").start()
-    for i in range(1000):
-        logger.info("Read value:\n{0}".format(client.get_position()))
-    client.stop()
+    with PositionClient("localhost") as client:
+        for i in range(1000):
+            logger.info("Read value:\n{0}".format(client.get_position()))
     logger.info("Exiting...")

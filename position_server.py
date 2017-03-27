@@ -6,10 +6,10 @@ from concurrent import futures
 from grpc_support import GenericServer
 from utils import setup_logging
 
-from gen.grpc_server_pb2 import Position
-from gen.grpc_server_pb2 import PositionServerServicer
-from gen.grpc_server_pb2 import ServerInfo
-from gen.grpc_server_pb2 import add_PositionServerServicer_to_server
+from pb.position_server_pb2 import Position
+from pb.position_server_pb2 import PositionServerServicer
+from pb.position_server_pb2 import ServerInfo
+from pb.position_server_pb2 import add_PositionServerServicer_to_server
 
 logger = logging.getLogger(__name__)
 
@@ -58,12 +58,12 @@ class PositionServer(PositionServerServicer, GenericServer):
 
 if __name__ == "__main__":
     setup_logging()
-    server = PositionServer().start()
-    for i in range(100):
-        server.write_position(in_focus=True if i % 2 == 0 else False,
-                              mid_offset=i,
-                              degrees=i + 1,
-                              mid_line_cross=i + 2,
-                              width=i + 3,
-                              middle_inc=i + 4)
-        time.sleep(1)
+    with PositionServer() as server:
+        for i in range(100):
+            server.write_position(in_focus=True if i % 2 == 0 else False,
+                                  mid_offset=i,
+                                  degrees=i + 1,
+                                  mid_line_cross=i + 2,
+                                  width=i + 3,
+                                  middle_inc=i + 4)
+            time.sleep(1)

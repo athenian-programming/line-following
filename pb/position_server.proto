@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package opencv_object_tracking;
+package line_following;
 
 service PositionServer {
 
