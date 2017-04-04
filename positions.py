@@ -4,10 +4,9 @@ import socket
 import grpc
 from grpc_support import CannotConnectException
 from grpc_support import grpc_url
+from proto.position_server_pb2 import ClientInfo
+from proto.position_server_pb2 import PositionServerStub
 from utils import setup_logging
-
-from pb.position_server_pb2 import ClientInfo
-from pb.position_server_pb2 import PositionServerStub
 
 logger = logging.getLogger(__name__)
 
@@ -40,5 +39,5 @@ if __name__ == "__main__":
     setup_logging()
     with Positions("localhost") as positions:
         for val in positions.values():
-            logger.info("Read value:\n{0}".format(val))
-        logger.info("Exiting...")
+            logger.info("Read value:\n%s", val)
+    logger.info("Exiting...")

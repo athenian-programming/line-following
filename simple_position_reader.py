@@ -19,17 +19,14 @@ if __name__ == "__main__":
     # Setup logging
     setup_logging(level=args[LOG_LEVEL])
 
-    positions = PositionClient(args[GRPC_HOST]).start()
-
-    try:
-        while True:
-            try:
-                print("Got position: {0}".format(positions.get_position(timeout=0.5)))
-            except TimeoutException:
-                print("No change in value")
-    except KeyboardInterrupt:
-        pass
-    finally:
-        positions.stop()
+    with PositionClient(args[GRPC_HOST]) as positions:
+        try:
+            while True:
+                try:
+                    print("Got position: {0}".format(positions.get_position(timeout=0.5)))
+                except TimeoutException:
+                    print("No change in value")
+        except KeyboardInterrupt:
+            pass
 
     logger.info("Exiting...")

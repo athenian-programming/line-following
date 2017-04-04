@@ -22,52 +22,51 @@ if __name__ == "__main__":
     setup_logging(level=args[LOG_LEVEL])
 
     # Start position client
-    positions = PositionClient(args[GRPC_HOST]).start()
+    with PositionClient(args[GRPC_HOST]) as positions:
 
-    stream_ids = tls.get_credentials_file()['stream_ids']
-    stream_id = stream_ids[1]
+        stream_ids = tls.get_credentials_file()['stream_ids']
+        stream_id = stream_ids[1]
 
-    # Declare graph
-    graph = go.Scatter(x=[], y=[], mode='lines+markers', stream=dict(token=stream_id, maxpoints=80))
-    data = go.Data([graph])
-    layout = go.Layout(title='Line Offsets', yaxis=go.YAxis(range=[-400, 400]))
-    fig = go.Figure(data=data, layout=layout)
-    py.plot(fig, filename='plot-positions')
+        # Declare graph
+        graph = go.Scatter(x=[], y=[], mode='lines+markers', stream=dict(token=stream_id, maxpoints=80))
+        data = go.Data([graph])
+        layout = go.Layout(title='Line Offsets', yaxis=go.YAxis(range=[-400, 400]))
+        fig = go.Figure(data=data, layout=layout)
+        py.plot(fig, filename='plot-positions')
 
-    # Write data
-    stream = py.Stream(stream_id)
-    stream.open()
+        # Write data
+        stream = py.Stream(stream_id)
+        stream.open()
 
-    logger.info("Opening plot.ly tab")
-    time.sleep(5)
+        logger.info("Opening plot.ly tab")
+        time.sleep(5)
 
-    prev_pos = None
+        prev_pos = None
 
-    try:
-        while True:
-            try:
-                val = positions.get_position(timeout=0.5)
+        try:
+            while True:
+                try:
+                    val = positions.get_position(timeout=0.5)
 
-                if not val.in_focus:
-                    prev_pos = None
-                    continue
+                    if not val.in_focus:
+                        prev_pos = None
+                        continue
 
-                y = val.mid_offset
-                prev_pos = y
+                    y = val.mid_offset
+                    prev_pos = y
 
-            # No change in value
-            except TimeoutException:
-                y = prev_pos
+                # No change in value
+                except TimeoutException:
+                    y = prev_pos
 
-            x = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
+                x = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
 
-            stream.write(dict(x=x, y=y))
-            time.sleep(.10)
+                stream.write(dict(x=x, y=y))
+                time.sleep(.10)
 
-    except KeyboardInterrupt:
-        pass
-    finally:
-        stream.close()
-        positions.stop()
+        except KeyboardInterrupt:
+            pass
+        finally:
+            stream.close()
 
     logger.info("Exiting...")

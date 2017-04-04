@@ -6,21 +6,21 @@ from concurrent import futures
 from grpc_support import GenericServer
 from utils import setup_logging
 
-from pb.position_server_pb2 import Position
-from pb.position_server_pb2 import PositionServerServicer
-from pb.position_server_pb2 import ServerInfo
-from pb.position_server_pb2 import add_PositionServerServicer_to_server
+from proto.position_service_pb2 import Position
+from proto.position_service_pb2 import PositionServiceServicer
+from proto.position_service_pb2 import ServerInfo
+from proto.position_service_pb2 import add_PositionServiceServicer_to_server
 
 logger = logging.getLogger(__name__)
 
 
-class PositionServer(PositionServerServicer, GenericServer):
+class PositionServer(PositionServiceServicer, GenericServer):
     def __init__(self, port=None):
         super(PositionServer, self).__init__(port=port, desc="position server")
         self.grpc_server = None
 
     def registerClient(self, request, context):
-        logger.info("Connected to {0} client {1} [{2}]".format(self.desc, context.peer(), request.info))
+        logger.info("Connected to %s client %s [%s]", self.desc, context.peer(), request.info)
         return ServerInfo(info="Server invoke count {0}".format(self.increment_cnt()))
 
     def getPositions(self, request, context):
@@ -31,9 +31,9 @@ class PositionServer(PositionServerServicer, GenericServer):
         self.write_position(False, -1, -1, -1, -1, -1)
 
     def _start_server(self):
-        logger.info("Starting gRPC {0} listening on {1}".format(self.desc, self.hostname))
+        logger.info("Starting gRPC %s listening on %s", self.desc, self.hostname)
         self.grpc_server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-        add_PositionServerServicer_to_server(self, self.grpc_server)
+        add_PositionServiceServicer_to_server(self, self.grpc_server)
         self.grpc_server.add_insecure_port(self.hostname)
         self.grpc_server.start()
         try:

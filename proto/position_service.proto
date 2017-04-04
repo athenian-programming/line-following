@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package line_following;
 
-service PositionServer {
+service PositionService {
 
     rpc registerClient (ClientInfo) returns (ServerInfo) {
     }
