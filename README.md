@@ -1,21 +1,17 @@
+[![Code Health](https://landscape.io/github/athenian-robotics/line-following/master/landscape.svg?style=flat)](https://landscape.io/github/athenian-robotics/line-following/master)
+
 # OpenCV Line Following
 
 ## Package Dependencies
 
-Install the following Python packages: 
+Using the *pysearchimages* Raspbian distro (which has OpenCV 3.2 bundled),
+install the required Python packages with: 
 
-* [gRPC](http://www.grpc.io/docs/guides/index.html) 
-as described [here](http://www.athenian-robotics.org/grpc/)
-
-* [OpenCV](http://opencv.org) 
-as described [here](http://www.athenian-robotics.org/opencv/)
-
-* [imutils](https://github.com/jrosebr1/imutils)
-as described [here](http://www.athenian-robotics.org/imutils/)
-
-* [numpy](http://www.numpy.org)
-as described [here](http://www.athenian-robotics.org/numpy/)
-
+```bash
+$ source start_py2cv3.sh
+$ pip install --upgrade pip
+$ pip install -r pip/requirements.txt
+```
 
 ## Line Follower
 
