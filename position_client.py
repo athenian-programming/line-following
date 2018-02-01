@@ -7,9 +7,9 @@ import time
 from threading import Event
 
 import grpc
-from grpc_support import GenericClient
-from grpc_support import TimeoutException
-from utils import setup_logging
+from arc852.grpc_support import GenericClient
+from arc852.grpc_support import TimeoutException
+from arc852.utils import setup_logging
 
 from proto.position_service_pb2 import ClientInfo
 from proto.position_service_pb2 import PositionServiceStub

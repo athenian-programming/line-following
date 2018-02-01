@@ -2,11 +2,11 @@ import logging
 import socket
 
 import grpc
-from grpc_support import CannotConnectException
-from grpc_support import grpc_url
+from arc852.grpc_support import CannotConnectException
+from arc852.grpc_support import grpc_url
+from arc852.utils import setup_logging
 from proto.position_server_pb2 import ClientInfo
 from proto.position_server_pb2 import PositionServerStub
-from utils import setup_logging
 
 logger = logging.getLogger(__name__)
 

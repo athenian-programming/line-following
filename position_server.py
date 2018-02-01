@@ -2,9 +2,9 @@ import logging
 import time
 
 import grpc
+from arc852.grpc_support import GenericServer
+from arc852.utils import setup_logging
 from concurrent import futures
-from grpc_support import GenericServer
-from utils import setup_logging
 
 from proto.position_service_pb2 import Position
 from proto.position_service_pb2 import PositionServiceServicer

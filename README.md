@@ -8,9 +8,9 @@ Using the *pysearchimages* Raspbian distro (which has OpenCV 3.2 bundled),
 install the required Python packages with: 
 
 ```bash
-$ source start_py2cv3.sh
-$ pip install --upgrade pip
-$ pip install -r pip/requirements.txt
+source start_py2cv3.sh
+pip install --upgrade pip
+pip install -r pip/requirements.txt
 ```
 
 ## Line Follower

@@ -1,11 +1,5 @@
 imutils
-numpy
-
 grpcio
-paho-mqtt
-flask
-requests
-pyserial
-
+arc852-robotics
 blinkt
 

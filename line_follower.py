@@ -5,30 +5,29 @@ import logging
 import sys
 import time
 
-import cli_args  as cli
+import arc852.cli_args  as cli
+import arc852.image_server as img_server
+import arc852.opencv_defaults as defs
+import arc852.opencv_utils as utils
 import cv2
-import image_server as img_server
 import imutils
 import numpy as np
-import opencv_defaults as defs
-import opencv_utils as utils
-from camera import Camera
-from constants import LOG_LEVEL
-from contour_finder import ContourFinder
-from opencv_utils import BLUE
-from opencv_utils import GREEN
-from opencv_utils import RED
-from opencv_utils import YELLOW
-from opencv_utils import get_moment
-from utils import is_raspi
-from utils import setup_logging
-from utils import strip_loglevel
+from arc852.camera import Camera
+from arc852.constants import LOG_LEVEL
+from arc852.contour_finder import ContourFinder
+from arc852.opencv_utils import BLUE
+from arc852.opencv_utils import GREEN
+from arc852.opencv_utils import RED
+from arc852.opencv_utils import YELLOW
+from arc852.opencv_utils import get_moment
+from arc852.utils import setup_logging
+from arc852.utils import strip_loglevel
 
 from position_server import PositionServer
 
 # I tried to include this in the constructor and make it depedent on self.__leds, but it does not work
-if is_raspi():
-    from blinkt import set_pixel, show
+# if is_raspi():
+#    from blinkt import set_pixel, show
 
 logger = logging.getLogger(__name__)
 
@@ -159,7 +158,7 @@ class LineFollower(object):
                     # if self._display:
                     # (x, y, w, h) = cv2.boundingRect(contour)
                     # cv2.rectangle(frame, (x, y), (x + w, y + h), BLUE, 2)
-                    # cv2.drawContours(frame, [contour], -1, GREEN, 2)
+                    cv2.drawContours(image, [contour], -1, GREEN, 2)
                     # cv2.circle(frame, (img_x, img_y), 4, RED, -1)
 
                     slope, degrees = utils.contour_slope_degrees(contour)
@@ -311,7 +310,7 @@ if __name__ == "__main__":
     # Parse CLI args
     parser = cli.argparse.ArgumentParser()
     cli.bgr(parser)
-    cli.usb(parser)
+    cli.usb_camera(parser)
     cli.width(parser)
     parser.add_argument("-f", "--focus", default=10, type=int, dest="focus_line_pct",
                         help="Focus line % from bottom [10]")
@@ -330,7 +329,7 @@ if __name__ == "__main__":
     cli.http_delay_secs(parser)
     cli.http_file(parser)
     cli.http_verbose(parser)
-    cli.verbose(parser)
+    cli.log_level(parser)
     args = vars(parser.parse_args())
 
     # Setup logging

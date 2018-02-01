@@ -2,11 +2,11 @@
 
 import logging
 
-import cli_args  as cli
-from cli_args import setup_cli_args
-from constants import LOG_LEVEL, GRPC_HOST
-from grpc_support import TimeoutException
-from utils import setup_logging
+import arc852.cli_args  as cli
+from arc852.cli_args import setup_cli_args
+from arc852.constants import LOG_LEVEL, GRPC_HOST
+from arc852.grpc_support import TimeoutException
+from arc852.utils import setup_logging
 
 from position_client import PositionClient
 
