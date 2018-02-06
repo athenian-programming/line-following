@@ -14,9 +14,10 @@ from position_client import PositionClient
 
 logger = logging.getLogger(__name__)
 
-if __name__ == "__main__":
+
+def main():
     # Parse CLI args
-    args = cli.setup_cli_args(cli.grpc_host, cli.verbose)
+    args = cli.setup_cli_args(cli.grpc_host, cli.log_level())
 
     # Setup logging
     setup_logging(level=args[LOG_LEVEL])
@@ -70,3 +71,7 @@ if __name__ == "__main__":
             stream.close()
 
     logger.info("Exiting...")
+
+
+if __name__ == "__main__":
+    main()

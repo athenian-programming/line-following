@@ -64,9 +64,13 @@ class PositionClient(GenericClient):
             yield self.get_position()
 
 
-if __name__ == "__main__":
+def main():
     setup_logging()
     with PositionClient("localhost") as client:
         for i in range(1000):
             logger.info("Read value:\n%s", client.get_position())
     logger.info("Exiting...")
+
+
+if __name__ == "__main__":
+    main()

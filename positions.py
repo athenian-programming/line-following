@@ -35,9 +35,13 @@ class Positions(object):
         return self._stub.getPositions(self._client_info)
 
 
-if __name__ == "__main__":
+def main():
     setup_logging()
     with Positions("localhost") as positions:
         for val in positions.values():
             logger.info("Read value:\n%s", val)
     logger.info("Exiting...")
+
+
+if __name__ == "__main__":
+    main()

@@ -56,7 +56,7 @@ class PositionServer(PositionServiceServicer, GenericServer):
             self.id += 1
 
 
-if __name__ == "__main__":
+def main():
     setup_logging()
     with PositionServer() as server:
         for i in range(100):
@@ -67,3 +67,7 @@ if __name__ == "__main__":
                                   width=i + 3,
                                   middle_inc=i + 4)
             time.sleep(1)
+
+
+if __name__ == "__main__":
+    main()

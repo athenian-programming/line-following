@@ -306,7 +306,7 @@ class LineFollower(object):
             show()
 
 
-if __name__ == "__main__":
+def main():
     # Parse CLI args
     parser = cli.argparse.ArgumentParser()
     cli.bgr(parser)
@@ -345,3 +345,7 @@ if __name__ == "__main__":
         line_follower.stop()
 
     logger.info("Exiting...")
+
+
+if __name__ == "__main__":
+    main()
