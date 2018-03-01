@@ -1,9 +1,8 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 from __future__ import absolute_import
 
 import logging
 import sys
-import time
 
 import arc852.cli_args  as cli
 import arc852.image_server as img_server
@@ -12,6 +11,7 @@ import arc852.opencv_utils as utils
 import cv2
 import imutils
 import numpy as np
+import time
 from arc852.camera import Camera
 from arc852.constants import LOG_LEVEL
 from arc852.contour_finder import ContourFinder
@@ -214,7 +214,7 @@ class LineFollower(object):
 
                 # Write position if it is different from previous value written
                 if focus_img_x != self.__prev_focus_img_x or (
-                            self.__report_midline and mid_line_cross != self.__prev_mid_line_cross):
+                        self.__report_midline and mid_line_cross != self.__prev_mid_line_cross):
                     self.__position_server.write_position(focus_img_x is not None,
                                                           focus_img_x - mid_x if focus_img_x is not None else 0,
                                                           degrees,
